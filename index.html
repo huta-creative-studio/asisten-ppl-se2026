@@ -1,0 +1,3840 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kalkulator Usaha – SE2026</title>
+<meta name="description" content="Kalkulator usaha untuk pengisian FASIH BPS SE2026">
+<meta name="theme-color" content="#1d6b2e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SE2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  /* System fonts - 100% offline, no internet needed */
+
+  /* ============================================================
+     EDIT WARNA — Skema saat ini: HIJAU PERTANIAN / ALAM
+     ============================================================ */
+  :root {
+    --font-ui: 'Google Sans', 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Roboto Mono', 'Courier New', monospace;
+    --bps-blue: #1d6b2e;          /* primary (hijau tua) */
+    --bps-light: #3a9442;         /* hijau segar */
+    --accent: #c97138;            /* aksen oranye terakota */
+    --accent-soft: #faeadf;
+    --bg: #f3f7f1;
+    --card: #ffffff;
+    --text: #1a2a1f;
+    --muted: #6b7a6f;
+    --border: #d5e3d2;
+    --green: #1a8a4a;
+    --green-bg: #e8f7ee;
+    --red: #c0392b;
+    --red-bg: #fdecea;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(29,107,46,0.10);
+  }
+
+  /* DARK MODE otomatis mengikuti preferensi sistem */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bps-blue: #2f9648;
+      --bps-light: #4ab964;
+      --accent: #e8954b;
+      --accent-soft: #3a2a1f;
+      --bg: #121915;
+      --card: #1c2520;
+      --text: #e6eee8;
+      --muted: #9bb0a2;
+      --border: #2c3a30;
+      --green: #4abf6e;
+      --green-bg: #1c3b27;
+      --red: #ef6b5d;
+      --red-bg: #3a1f1c;
+      --shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    .lock-box, .jenis-card { background: var(--card); }
+    input, select, textarea { background: var(--card) !important; color: var(--text) !important; }
+    .input-prefix { background: rgba(255,255,255,0.04); color: var(--muted); }
+    .toast { background: rgba(255,255,255,0.12); color: var(--text); }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Google Sans', 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--bps-blue);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+  }
+  .logo-badge {
+    background: var(--accent);
+    color: var(--bps-blue);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 15px; font-weight: 700; line-height: 1.2; }
+  .header-title p { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+
+  .tab-nav {
+    display: flex;
+    background: rgba(255,255,255,0.08);
+    border-top: 1px solid rgba(255,255,255,0.12);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 1 0 auto;
+    min-width: 92px;
+    white-space: nowrap;
+    padding: 10px 8px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.65);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    letter-spacing: 0.3px;
+  }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(232,160,32,0.08);
+  }
+
+  main { padding: 16px; max-width: 540px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .jenis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .jenis-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .jenis-card:hover { border-color: var(--bps-light); }
+  .jenis-card.selected {
+    border-color: var(--bps-blue);
+    background: var(--green-bg);
+  }
+  .jenis-card .icon { font-size: 26px; display: block; margin-bottom: 6px; }
+  .jenis-card .label { font-size: 12px; font-weight: 600; color: var(--text); }
+
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bps-blue);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .card-title .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .input-wrap:focus-within { border-color: var(--bps-light); }
+  .input-prefix {
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--border);
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    border-right: 1.5px solid var(--border);
+    white-space: nowrap;
+  }
+  input[type="number"], input[type="text"], select {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 12px;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    min-width: 0;
+  }
+  input.rp-input {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--bps-blue);
+  }
+  select { font-family: 'Google Sans', 'Roboto', system-ui, sans-serif; font-size: 13px; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .hari-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .hari-btn {
+    aspect-ratio: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .hari-btn.active {
+    background: var(--bps-blue);
+    border-color: var(--bps-blue);
+    color: white;
+  }
+
+  .biaya-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .biaya-nama { flex: 1.1; min-width: 0; }
+  .biaya-nom  { min-width: 0; }
+
+  .rt-row {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: var(--bg);
+  }
+  .rt-row-line1 {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .rt-row-line1 .biaya-nama { flex: 1; }
+  .rt-row-line2 {
+    display: flex;
+    gap: 8px;
+  }
+  .biaya-nom { flex: 1.4; }
+  .del-btn {
+    background: var(--red-bg);
+    border: none;
+    color: var(--red);
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .add-btn {
+    width: 100%;
+    padding: 9px;
+    background: none;
+    border: 1.5px dashed var(--bps-light);
+    border-radius: 8px;
+    color: var(--bps-light);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .add-btn:hover { background: var(--green-bg); }
+
+  .hitung-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--bps-blue);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: background 0.2s;
+    margin-bottom: 20px;
+  }
+  .hitung-btn:hover { background: var(--bps-light); }
+  .hitung-btn:active { transform: scale(0.98); }
+
+  .hasil-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .hasil-box {
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+  }
+  .hasil-box.harian { background: var(--green-bg); border: 1.5px solid var(--bps-light); }
+  .hasil-box.bulanan { background: var(--green-bg); border: 1.5px solid #a3d9b8; }
+  .hasil-box.tahunan { background: var(--accent-soft); border: 1.5px solid #f0d090; grid-column: span 2; }
+  .hasil-box .hasil-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .hasil-box .hasil-nilai {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: clamp(12px, 4vw, 15px);
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hasil-box.tahunan .hasil-nilai { font-size: clamp(13px, 4.5vw, 18px); color: var(--bps-blue); }
+  .hasil-box .hasil-terbilang { font-size: 10px; color: var(--muted); margin-top: 3px; font-style: italic; }
+
+  .ringkasan-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    gap: 8px;
+  }
+  .ringkasan-row:last-child { border-bottom: none; }
+  .ringkasan-row .rk-label { color: var(--muted); flex: 1; }
+  .ringkasan-row .rk-val {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: right;
+  }
+  .rk-val.plus { color: var(--green); }
+  .rk-val.minus { color: var(--red); }
+  .rk-val.total { color: var(--bps-blue); font-size: 14px; }
+
+  .copy-btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--accent);
+    color: var(--bps-blue);
+    border: none;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .copy-btn:hover { background: #d4900a; color: white; }
+  .copy-btn.blue { background: var(--bps-blue); color: white; }
+  .copy-btn.blue:hover { background: var(--bps-light); }
+
+  .reset-btn {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* KONVERTER */
+  .konverter-result {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-top: 14px;
+  }
+  .konv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .konv-row:last-child { border-bottom: none; }
+  .konv-label { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+  .konv-nilai {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--bps-blue);
+  }
+  .konv-active { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; }
+
+  /* RIWAYAT */
+  .riwayat-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--bps-blue);
+  }
+  .ri-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .ri-nama { font-size: 13px; font-weight: 700; }
+  .ri-waktu { font-size: 10px; color: var(--muted); }
+  .ri-jenis { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .ri-angka {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--bps-blue);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .ri-detail-body {
+    border-top: 1px dashed var(--border);
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .ri-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .ri-detail-cat {
+    font-weight: 700;
+    color: var(--bps-blue);
+    font-size: 12px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+  }
+  .ri-footer { display: flex; gap: 6px; margin-top: 10px; }
+  .ri-btn {
+    flex: 1;
+    padding: 7px;
+    border-radius: 7px;
+    border: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .ri-btn.copy { background: var(--accent-soft); color: var(--accent); border: 1px solid #f0d090; }
+  .ri-btn.del { background: var(--red-bg); color: var(--red); border: 1px solid #f0c0bb; }
+
+  .empty-state { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0; }
+  .empty-state .empty-icon { font-size: 40px; display: block; margin-bottom: 10px; }
+  .clear-all-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--red-bg);
+    border: 1.5px solid #f0c0bb;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  /* INSTALL BANNER */
+  #installBanner {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 3px solid var(--accent);
+    padding: 14px 16px; z-index: 200;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    animation: slideUp 0.3s ease;
+    align-items: center; gap: 12px;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  #installBanner.visible { display: flex; }
+  .install-icon { font-size: 28px; flex-shrink: 0; }
+  .install-text { flex: 1; }
+  .install-text strong { font-size: 13px; display: block; color: var(--text); }
+  .install-text span { font-size: 11px; color: var(--muted); }
+  .install-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .install-yes { background: var(--bps-blue); color: white; border: none; border-radius: 8px; padding: 8px 14px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .install-no { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; font-family: inherit; font-size: 12px; color: var(--muted); cursor: pointer; }
+  #offlineBadge { display: none; position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #444; color: white; font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 20px; z-index: 300; gap: 6px; align-items: center; }
+  #offlineBadge.show { display: flex; }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--bps-blue);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: transform 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid #f0d090;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  /* LOCK SCREEN */
+  #lockScreen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, var(--bps-blue) 0%, #002a5c 100%);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  #lockScreen.hidden { display: none; }
+  .lock-box {
+    background: white; border-radius: 16px;
+    padding: 32px 24px; max-width: 360px; width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+  .lock-box .lock-icon { font-size: 44px; margin-bottom: 10px; }
+  .lock-box h2 { font-size: 17px; color: var(--bps-blue); font-weight: 700; margin-bottom: 4px; }
+  .lock-box p { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .lock-box input {
+    width: 100%; padding: 13px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 16px; text-align: center; letter-spacing: 2px;
+    text-transform: uppercase; outline: none; margin-bottom: 12px;
+  }
+  .lock-box input:focus { border-color: var(--bps-light); }
+  .lock-box button {
+    width: 100%; padding: 13px;
+    background: var(--bps-blue); color: white;
+    border: none; border-radius: 8px;
+    font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .lock-box button:disabled { opacity: 0.6; }
+  .lock-box button:active { transform: scale(0.98); }
+  .lock-msg {
+    font-size: 12px; margin-top: 10px; display: none; text-align: left;
+    padding: 10px 12px; border-radius: 8px;
+  }
+  .lock-msg.show { display: block; }
+  .lock-msg.error { background: var(--red-bg); color: var(--red); border: 1px solid #f0c0bb; }
+  .lock-msg.info { background: var(--green-bg); color: var(--bps-blue); border: 1px solid var(--bps-light); }
+  .lock-footer { font-size: 10px; color: var(--muted); margin-top: 16px; opacity: 0.7; }
+  .lock-spinner {
+    display: inline-block; width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.4); border-top-color: white;
+    border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 6px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ============================================================
+     KBLI TAG, RUGI WARNING, EXPORT BUTTONS (fitur tambahan)
+     ============================================================ */
+  .kbli-tag {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .kbli-tag strong { color: var(--accent); letter-spacing: 0.3px; }
+
+  .rugi-warning {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--red-bg);
+    border-left: 4px solid var(--red);
+    border-radius: 8px;
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .export-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .export-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1.5px solid var(--bps-light);
+    color: var(--bps-blue);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .export-btn:hover { background: var(--green-bg); }
+
+  /* ============================================================
+     EDIT MODE BANNER (untuk edit riwayat)
+     ============================================================ */
+  .edit-banner {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .edit-banner.show { display: flex; }
+  .edit-banner .eb-text { flex: 1; line-height: 1.3; }
+  .edit-banner .eb-text small { display: block; font-weight: 400; opacity: 0.85; margin-top: 2px; font-size: 10.5px; }
+  .edit-banner button {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .edit-banner button:hover { background: rgba(255,255,255,0.3); }
+
+  .ri-btn.edit { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+  .ri-btn.edit:hover { background: var(--accent); color: #fff; }
+
+  /* ============================================================
+     JENIS USAHA DROPDOWN (pengganti grid)
+     ============================================================ */
+  .jenis-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231d6b2e' d='M6 8L0 2l1.4-1.4L6 5.2 10.6.6 12 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+  .jenis-select:focus { border-color: var(--bps-blue); outline: none; }
+  .jenis-select option { padding: 6px; }
+
+  /* ============================================================
+     YEARLY HINT (biaya per item — auto kalkulasi setahun)
+     ============================================================ */
+  .yearly-hint {
+    flex-basis: 100%;
+    margin-top: 2px;
+    padding: 4px 8px;
+    background: var(--green-bg);
+    color: var(--bps-blue);
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-align: right;
+    letter-spacing: 0.2px;
+  }
+  .yearly-hint.empty { display: none; }
+
+  /* ============================================================
+     TENAGA KERJA — RINGKASAN SETAHUN
+     ============================================================ */
+  .tk-summary {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: var(--green-bg);
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .tk-summary .tk-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    color: var(--text);
+  }
+  .tk-summary .tk-row.total {
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1.5px solid var(--bps-light);
+    font-weight: 700;
+    color: var(--bps-blue);
+    font-size: 13px;
+  }
+  .tk-summary .tk-val { font-variant-numeric: tabular-nums; }
+
+  /* ============================================================
+     R26 SUMMARY (tab Biaya Usaha — read-only + Salin Nominal)
+     ============================================================ */
+  .r26-summary { display: flex; flex-direction: column; gap: 8px; }
+  .r26-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .r26-row.total {
+    background: var(--green-bg);
+    border-color: var(--bps-light);
+    border-width: 1.5px;
+    margin-top: 6px;
+  }
+  .r26-label { font-size: 12.5px; color: var(--text); line-height: 1.3; }
+  .r26-val   { font-size: 14px; font-weight: 700; color: var(--bps-blue); font-variant-numeric: tabular-nums; min-width: 100px; text-align: right; }
+  .r26-row.total .r26-val { font-size: 16px; }
+  .copy-num-btn {
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .copy-num-btn:hover, .copy-num-btn:active { background: var(--accent); color: #fff; transform: scale(1.05); }
+  .copy-num-btn.primary { background: var(--bps-blue); color: #fff; border-color: var(--bps-blue); }
+  .copy-num-btn.primary:hover { background: var(--bps-light); }
+
+  /* ============================================================
+     RESPONDEN AKTIF BANNER (sticky di tab Kalkulator)
+     ============================================================ */
+  .resp-aktif-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(135deg, var(--bps-blue), var(--bps-light));
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  }
+  .resp-aktif-bar .ra-icon { font-size: 22px; }
+  .resp-aktif-bar .ra-text { flex: 1; line-height: 1.25; min-width: 0; }
+  .resp-aktif-bar .ra-text strong { display: block; font-size: 13.5px; word-break: break-word; }
+  .resp-aktif-bar .ra-text small { font-size: 10.5px; opacity: 0.85; }
+  .resp-aktif-bar button {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.5);
+    color: #fff;
+    padding: 7px 12px;
+    border-radius: 7px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .resp-aktif-bar button:hover { background: rgba(255,255,255,0.3); }
+  .resp-aktif-bar.kosong { background: var(--muted); }
+  .resp-aktif-bar.kosong .ra-text strong { opacity: 0.8; font-style: italic; }
+
+  /* ===== FLOATING "Simpan Semua" BUTTON ===== */
+  #btnSimpanSemua {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 90;
+    background: linear-gradient(135deg, var(--bps-blue) 0%, var(--bps-light) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    box-shadow: 0 8px 22px rgba(29,107,46,0.35), 0 2px 6px rgba(0,0,0,0.12);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  #btnSimpanSemua:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(29,107,46,0.45), 0 4px 8px rgba(0,0,0,0.15);
+  }
+  #btnSimpanSemua:active { transform: translateY(0); }
+  #btnSimpanSemua:disabled { opacity: 0.6; cursor: not-allowed; }
+  #btnSimpanSemua .ss-icon { font-size: 18px; }
+  #btnSimpanSemua .ss-badge {
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    #btnSimpanSemua { right: 12px; bottom: 12px; padding: 12px 18px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-box" id="lockBox">
+    <div class="lock-icon">🔒</div>
+    <h2>Kalkulator Usaha SE2026</h2>
+    <p>Masukkan kode akses yang diberikan admin</p>
+    <input type="text" id="kodeAkses" placeholder="KODE AKSES" maxlength="30" autocomplete="off" autocapitalize="characters">
+    <button id="btnAktivasi" onclick="aktivasiKode()">Buka Aplikasi</button>
+    <div class="lock-msg" id="lockMsg"></div>
+    <div class="lock-footer" id="lockFooter">✦ by HUTA CREATIVE STUDIO</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo-badge">BPS</div>
+    <div class="header-title">
+      <h1>Kalkulator Usaha SE2026</h1>
+      <p>Bantu pengisian FASIH lebih cepat &amp; akurat</p>
+      <p id="headerAuthor" style="font-size:10px;opacity:0.55;margin-top:2px;letter-spacing:0.3px">✦ by HUTA CREATIVE STUDIO</p>
+    </div>
+  </div>
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('kalkulator')">🧮 Kalkulator</button>
+    <button class="tab-btn" onclick="showTab('biayausaha')">📊 Biaya Usaha</button>
+    <button class="tab-btn" onclick="showTab('nilaiAset')">🏠 Nilai Aset</button>
+    <button class="tab-btn" onclick="showTab('belanjart')">🛍️ Belanja RT</button>
+    <button class="tab-btn" onclick="showTab('konverter')">🔄 Konverter</button>
+    <button class="tab-btn" onclick="showTab('riwayat')">📋 Riwayat</button>
+  </div>
+</header>
+
+<!-- Edit Mode Banner (tampil saat user edit riwayat) -->
+<div id="editBanner" class="edit-banner">
+  <span style="font-size:18px">✏️</span>
+  <div class="eb-text">
+    Mode Edit
+    <small id="editBannerInfo">—</small>
+  </div>
+  <button onclick="batalEdit()">Batal Edit</button>
+</div>
+
+<main>
+
+<!-- Floating master save button (visible across all tabs) -->
+<button id="btnSimpanSemua" onclick="simpanSemuaResponden()" data-testid="btn-simpan-semua" title="Simpan semua data responden dari semua tab">
+  <span class="ss-icon">💾</span>
+  <span>Simpan Semua</span>
+</button>
+
+<!-- ===================== TAB: KALKULATOR ===================== -->
+<div id="tab-kalkulator" class="section active">
+
+  <!-- Responden Aktif banner -->
+  <div id="respondenAktifBar" class="resp-aktif-bar kosong" data-testid="resp-aktif-bar">
+    <span class="ra-icon">👤</span>
+    <div class="ra-text">
+      <strong id="raNama">Belum ada responden aktif</strong>
+      <small id="raInfo">Isi Nama Usaha di bawah untuk memulai</small>
+    </div>
+    <button onclick="mulaiRespondenBaru()" data-testid="btn-responden-baru">+ Responden Baru</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Jenis Usaha Responden</div>
+    <!-- Dropdown jenis usaha (sebelumnya grid) -->
+    <select id="jenisUsahaSelect" class="jenis-select" onchange="pilihJenis(null, this.value)">
+      <option value="">— Pilih Jenis Usaha —</option>
+      <option value="dagang">🛒 Dagang / Retail</option>
+      <option value="kuliner">🍽️ Kuliner / Makanan</option>
+      <option value="jasa">🔧 Usaha Jasa</option>
+      <option value="produksi">🏭 Produksi / Manufaktur</option>
+      <option value="pertanian">🌿 Pertanian / Perkebunan</option>
+      <option value="peternakan">🐄 Peternakan</option>
+      <option value="konstruksi">🏗️ Konstruksi / Bangunan</option>
+      <option value="transportasi">🚚 Transportasi / Logistik</option>
+      <option value="penginapan">🛏️ Penginapan / Hotel</option>
+      <option value="pendidikan">🎓 Pendidikan / Bimbel</option>
+      <option value="kesehatan">🏥 Kesehatan / Praktik</option>
+      <option value="kerajinan">🧵 Kerajinan / Konveksi</option>
+      <option value="lainnya">📦 Lainnya / Campuran</option>
+    </select>
+    <!-- KBLI tag muncul otomatis saat jenis dipilih -->
+    <div id="kbliTag" class="kbli-tag" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Identitas &amp; Periode</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="field" style="margin-bottom:0">
+        <label>No. Urut Keluarga</label>
+        <div class="input-wrap">
+          <span class="input-prefix">KK</span>
+          <input type="number" id="nomorKeluarga" placeholder="001" min="1">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>No. Urut Bangunan</label>
+        <div class="input-wrap">
+          <span class="input-prefix">BG</span>
+          <input type="number" id="nomorBangunan" placeholder="001" min="1">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>Nama Usaha (opsional)</label>
+      <div class="input-wrap">
+        <input type="text" id="namaUsaha" placeholder="Contoh: Warung Bu Sari" oninput="onNamaUsahaInput()" onblur="onNamaUsahaBlur()" data-testid="input-nama-usaha">
+      </div>
+    </div>
+    <div class="field">
+      <label>Pekerjaan Utama Responden</label>
+      <div class="input-wrap">
+        <select id="pekerjaanResponden">
+          <option value="Pemilik Usaha">Pemilik Usaha</option>
+          <option value="Karyawan Swasta">Karyawan Swasta</option>
+          <option value="PNS / ASN">PNS / ASN</option>
+          <option value="Honorer / Kontrak">Honorer / Kontrak</option>
+          <option value="Buruh Harian">Buruh Harian</option>
+          <option value="Petani / Nelayan">Petani / Nelayan</option>
+          <option value="Pekerja Bebas / Freelance">Pekerja Bebas / Freelance</option>
+          <option value="Pensiunan">Pensiunan</option>
+          <option value="Tidak Bekerja">Tidak Bekerja</option>
+          <option value="Pelajar / Mahasiswa">Pelajar / Mahasiswa</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <p class="hint">Status pekerjaan utama responden (ART yang diwawancarai)</p>
+    </div>
+    <div class="field">
+      <label>Responden menyebut omzet per</label>
+      <div class="input-wrap">
+        <select id="satuanWaktu" onchange="updateSatuan()">
+          <option value="hari">Hari</option>
+          <option value="minggu">Minggu</option>
+          <option value="bulan">Bulan</option>
+        </select>
+      </div>
+    </div>
+    <div id="hariKerjaSection" class="field">
+      <label>Hari Kerja per Minggu</label>
+      <div class="hari-grid" id="hariGrid">
+        <div class="hari-btn active" onclick="toggleHari(this)">Sen</div>
+        <div class="hari-btn active" onclick="toggleHari(this)">Sel</div>
+        <div class="hari-btn active" onclick="toggleHari(this)">Rab</div>
+        <div class="hari-btn active" onclick="toggleHari(this)">Kam</div>
+        <div class="hari-btn active" onclick="toggleHari(this)">Jum</div>
+        <div class="hari-btn" onclick="toggleHari(this)">Sab</div>
+        <div class="hari-btn" onclick="toggleHari(this)">Min</div>
+      </div>
+      <p class="hint" id="hariHint">5 hari kerja / minggu → ~22 hari/bulan</p>
+    </div>
+    <div id="musimSection" class="field" style="display:none">
+      <label id="labelMusim">Jumlah Bulan Panen dalam 1 Tahun</label>
+      <div class="input-wrap">
+        <input type="number" id="bulanPanen" value="4" min="1" max="12" oninput="hitungOtomatis()">
+        <span class="input-prefix">dari 12 bulan</span>
+      </div>
+      <p class="hint" id="hintMusim">Contoh: jika panen 2x setahun, masing-masing perlu 2 bulan kerja → isi <b>4</b> (bukan bulan ke berapa terjadinya, tapi total berapa bulan ada hasil panen)</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Omzet / Penjualan Kotor</div>
+    <div class="field">
+      <label id="labelOmzet">Omzet per Hari</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="omzet" placeholder="0" oninput="hitungOtomatis()">
+      </div>
+      <p class="hint" id="hintOmzet">Masukkan total penjualan rata-rata per hari</p>
+    </div>
+  </div>
+
+  <!-- Element legacy untuk backward compat (hidden) -->
+  <div id="biayaList" style="display:none"></div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Tenaga Kerja</div>
+    <div class="field">
+      <label>Jumlah Karyawan (selain pemilik)</label>
+      <div class="input-wrap">
+        <input type="number" id="jumlahKaryawan" value="0" min="0" oninput="hitungOtomatis()">
+        <span class="input-prefix">orang</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Rata-rata Gaji per Orang per Bulan</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="gajiPerOrang" placeholder="0" oninput="hitungOtomatis()">
+      </div>
+    </div>
+    <div class="field">
+      <label>Jaminan Sosial per Orang per Bulan</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="jamsosPerOrang" placeholder="0" oninput="hitungOtomatis()">
+      </div>
+      <p class="hint">BPJS Kesehatan + BPJS Ketenagakerjaan + iuran lain (kalau ada)</p>
+    </div>
+    <div class="field">
+      <label>Bonus / THR per Orang per Tahun</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="thrPerOrang" placeholder="0" oninput="hitungOtomatis()">
+      </div>
+      <p class="hint">Total bonus + THR dalam setahun (umumnya 1× gaji bulanan)</p>
+    </div>
+    <!-- Ringkasan biaya tenaga kerja setahun -->
+    <div id="tkSummary" class="tk-summary" style="display:none">
+      <div class="tk-row"><span>Gaji (12× /orang × jumlah)</span><span class="tk-val" id="tkGajiTahun">Rp 0</span></div>
+      <div class="tk-row"><span>Jaminan Sosial (12× /orang × jumlah)</span><span class="tk-val" id="tkJamsosTahun">Rp 0</span></div>
+      <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun">Rp 0</span></div>
+      <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun">Rp 0</span></div>
+    </div>
+  </div>
+
+  <!-- ========= RINCIAN 26 (b–e) — input lengkap pengeluaran usaha ========= -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>📋 Rincian Pengeluaran (Rincian 26 FASIH)</div>
+    <p class="hint" style="margin-bottom:14px">
+      26.a otomatis dari Tenaga Kerja di atas. Isi 26.b sampai 26.e di bawah ini —
+      ringkasan akhir bisa dilihat &amp; disalin nominalnya di tab <b>📊 Biaya Usaha</b>.
+    </p>
+
+    <div class="field">
+      <label><strong>26.a</strong> Total Upah, Gaji &amp; Jaminan Sosial Pegawai</label>
+      <p class="hint" style="margin-bottom:6px">Otomatis dihitung dari "Tenaga Kerja" di atas.</p>
+      <div class="hasil-box bulanan" style="grid-column:unset">
+        <div class="hasil-label">Subtotal 26.a</div>
+        <div class="hasil-nilai" id="bu26a-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label><strong>26.b</strong> Biaya Produksi</label>
+      <p class="hint" style="margin-bottom:10px">Isi nominal <b>per bulan</b> per item — subtotal otomatis × 12 untuk total setahun.</p>
+      <div id="bu26bList"></div>
+      <button class="add-btn" onclick="tambahItemProduksi()">+ Tambah Item Biaya Produksi</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 26.b / Tahun</div>
+        <div class="hasil-nilai" id="bu26b-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label><strong>26.c</strong> Biaya Sewa &amp; Jasa Lainnya</label>
+      <p class="hint" style="margin-bottom:10px">Isi nominal <b>per bulan</b> per item — subtotal otomatis × 12 untuk total setahun.</p>
+      <div id="bu26cList"></div>
+      <button class="add-btn" onclick="tambahItemBiaya('c')">+ Tambah Item 26.c</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 26.c / Tahun</div>
+        <div class="hasil-nilai" id="bu26c-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label><strong>26.d</strong> Biaya Operasional</label>
+      <p class="hint" style="margin-bottom:10px">Isi nominal <b>per bulan</b> per item — subtotal otomatis × 12 untuk total setahun.</p>
+      <div id="bu26dList"></div>
+      <button class="add-btn" onclick="tambahItemBiaya('d')">+ Tambah Item 26.d</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 26.d / Tahun</div>
+        <div class="hasil-nilai" id="bu26d-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label><strong>26.e</strong> Biaya Non-Operasional</label>
+      <p class="hint" style="margin-bottom:10px">Isi nominal <b>per bulan</b> per item — subtotal otomatis × 12 untuk total setahun.</p>
+      <div id="bu26eList"></div>
+      <button class="add-btn" onclick="tambahItemBiaya('e')">+ Tambah Item 26.e</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 26.e / Tahun</div>
+        <div class="hasil-nilai" id="bu26e-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+
+    <!-- Compat: bu26aList tidak dipakai (Tenaga Kerja menggantikan), tapi tetap ada agar JS legacy tidak error -->
+    <div id="bu26aList" style="display:none"></div>
+  </div>
+
+  <button class="hitung-btn" onclick="hitung()">🧮 HITUNG PENGHASILAN</button>
+
+  <div id="hasilSection" style="display:none">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Hasil Kalkulasi <span id="badgeJenis" class="badge" style="margin-left:6px"></span></div>
+
+      <div class="hasil-grid">
+        <div class="hasil-box harian">
+          <div class="hasil-label">Omzet / Hari</div>
+          <div class="hasil-nilai" id="res-omzet-hari">-</div>
+        </div>
+        <div class="hasil-box" style="background:var(--green-bg);border:1.5px solid var(--bps-light);border-radius:var(--radius);padding:14px;text-align:center;">
+          <div class="hasil-label">Omzet / Bulan</div>
+          <div class="hasil-nilai" id="res-omzet-bulan">-</div>
+        </div>
+        <div class="hasil-box tahunan">
+          <div class="hasil-label">Omzet / Tahun</div>
+          <div class="hasil-nilai" id="res-omzet-tahun">-</div>
+          <div class="hasil-terbilang" id="res-omzet-terbilang"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div id="ringkasanBiaya"></div>
+      <div class="divider"></div>
+
+      <div class="hasil-grid">
+        <div class="hasil-box harian">
+          <div class="hasil-label">Laba Bersih / Hari</div>
+          <div class="hasil-nilai" id="res-laba-hari">-</div>
+        </div>
+        <div class="hasil-box bulanan">
+          <div class="hasil-label">Laba Bersih / Bulan</div>
+          <div class="hasil-nilai" id="res-laba-bulan">-</div>
+        </div>
+        <div class="hasil-box tahunan">
+          <div class="hasil-label">💰 Laba Bersih / Tahun</div>
+          <div class="hasil-nilai" id="res-laba-tahun">-</div>
+          <div class="hasil-terbilang" id="res-laba-terbilang"></div>
+        </div>
+      </div>
+
+      <!-- Warning rugi otomatis muncul jika laba < 0 -->
+      <div id="rugiWarning" class="rugi-warning" style="display:none"></div>
+
+      <button class="copy-btn" onclick="salinHasil()">📋 Salin Catatan</button>
+      <button class="reset-btn" onclick="resetForm()">↺ Reset Form</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB: BIAYA USAHA (Ringkasan + Salin Nominal) ===================== -->
+<div id="tab-biayausaha" class="section">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>📊 Ringkasan Pengeluaran Usaha</div>
+    <p class="hint" style="margin-bottom:14px">
+      Data ini <b>otomatis</b> dari tab Kalkulator. Klik 📋 untuk salin angka <b>tanpa titik</b>
+      — siap di-paste langsung ke FASIH tanpa error format.
+    </p>
+
+    <div class="r26-summary">
+      <div class="r26-row">
+        <div class="r26-label"><b>26.a</b> Upah, Gaji &amp; Jaminan Sosial</div>
+        <div class="r26-val" id="sum26a">Rp 0</div>
+        <button class="copy-num-btn" onclick="salinNominal('sum26a','26.a')" data-testid="copy-26a">📋</button>
+      </div>
+      <div class="r26-row">
+        <div class="r26-label"><b>26.b</b> Biaya Produksi</div>
+        <div class="r26-val" id="sum26b">Rp 0</div>
+        <button class="copy-num-btn" onclick="salinNominal('sum26b','26.b')" data-testid="copy-26b">📋</button>
+      </div>
+      <div class="r26-row">
+        <div class="r26-label"><b>26.c</b> Sewa &amp; Jasa Lainnya</div>
+        <div class="r26-val" id="sum26c">Rp 0</div>
+        <button class="copy-num-btn" onclick="salinNominal('sum26c','26.c')" data-testid="copy-26c">📋</button>
+      </div>
+      <div class="r26-row">
+        <div class="r26-label"><b>26.d</b> Biaya Operasional</div>
+        <div class="r26-val" id="sum26d">Rp 0</div>
+        <button class="copy-num-btn" onclick="salinNominal('sum26d','26.d')" data-testid="copy-26d">📋</button>
+      </div>
+      <div class="r26-row">
+        <div class="r26-label"><b>26.e</b> Biaya Non-Operasional</div>
+        <div class="r26-val" id="sum26e">Rp 0</div>
+        <button class="copy-num-btn" onclick="salinNominal('sum26e','26.e')" data-testid="copy-26e">📋</button>
+      </div>
+      <div class="r26-row total">
+        <div class="r26-label"><b>26.f</b> TOTAL Pengeluaran</div>
+        <div class="r26-val" id="sum26f">Rp 0</div>
+        <button class="copy-num-btn primary" onclick="salinNominal('sum26f','26.f Total')" data-testid="copy-26f">📋</button>
+      </div>
+    </div>
+    <p class="r26-terbilang" id="sum26-terbilang" style="margin-top:14px;font-size:12px;font-style:italic;color:var(--muted);text-align:center"></p>
+
+    <!-- Compat (read-only displays for legacy salinBiayaUsaha) -->
+    <div id="bu26f" style="display:none">Rp 0</div>
+    <div id="bu26f-terbilang" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===================== TAB: NILAI ASET (Rincian 28 FASIH) ===================== -->
+<div id="tab-nilaiAset" class="section">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Rincian 28. Nilai Aset Usaha</div>
+    <p class="hint" style="margin-bottom:14px">Nilai aset per 31 Desember tahun terakhir. Sesuai Rincian 28 FASIH SE2026.</p>
+
+    <div class="field">
+      <label>28.a Nilai Aset Tanah</label>
+      <p class="hint" style="margin-bottom:10px">Rincian per item: tanah lokasi 1, tanah lokasi 2, dll.</p>
+      <div id="aset28aList"></div>
+      <button class="add-btn" onclick="tambahItemAset('a')">+ Tambah Item 28.a</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 28.a</div>
+        <div class="hasil-nilai" id="aset28a-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>28.b Nilai Aset Bangunan</label>
+      <p class="hint" style="margin-bottom:10px">Rincian per item: bangunan utama, gudang, dll.</p>
+      <div id="aset28bList"></div>
+      <button class="add-btn" onclick="tambahItemAset('b')">+ Tambah Item 28.b</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 28.b</div>
+        <div class="hasil-nilai" id="aset28b-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>28.c Nilai Mesin &amp; Peralatan</label>
+      <p class="hint" style="margin-bottom:10px">Rincian per item: mesin produksi, peralatan kerja, dll.</p>
+      <div id="aset28cList"></div>
+      <button class="add-btn" onclick="tambahItemAset('c')">+ Tambah Item 28.c</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 28.c</div>
+        <div class="hasil-nilai" id="aset28c-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>28.d Nilai Kendaraan Usaha</label>
+      <p class="hint" style="margin-bottom:10px">Rincian per item: motor, mobil, truk, dll.</p>
+      <div id="aset28dList"></div>
+      <button class="add-btn" onclick="tambahItemAset('d')">+ Tambah Item 28.d</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 28.d</div>
+        <div class="hasil-nilai" id="aset28d-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>28.e Nilai Aset Lainnya (stok, piutang, dll)</label>
+      <p class="hint" style="margin-bottom:10px">Rincian per item: stok barang, piutang usaha, dll.</p>
+      <div id="aset28eList"></div>
+      <button class="add-btn" onclick="tambahItemAset('e')">+ Tambah Item 28.e</button>
+      <div class="hasil-box bulanan" style="grid-column:unset;margin-top:10px">
+        <div class="hasil-label">Subtotal 28.e</div>
+        <div class="hasil-nilai" id="aset28e-subtotal" style="font-size:16px">Rp 0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Ringkasan Nilai Aset</div>
+    <div id="ringkasanAset"></div>
+    <div class="divider"></div>
+    <div class="hasil-box tahunan" style="grid-column:unset;margin-top:4px">
+      <div class="hasil-label">28.f Total Nilai Aset Usaha</div>
+      <div class="hasil-nilai" id="aset-total" style="font-size:18px;color:var(--bps-blue)">Rp 0</div>
+      <div class="hasil-terbilang" id="aset-terbilang"></div>
+    </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinAset()">📋 Salin Catatan</button>
+    <button class="reset-btn" onclick="resetAset()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- ===================== TAB: BELANJA RT (Pengeluaran Rumah Tangga) ===================== -->
+<div id="tab-belanjart" class="section">
+
+  <!-- BAGIAN 1: MAKANAN & MINUMAN -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>🍽️ Pengeluaran Makanan &amp; Minuman</div>
+    <p class="hint" style="margin-bottom:12px">Rincian per item, satuan waktu bebas (akan dikonversi otomatis ke mingguan)</p>
+    <div id="rtMakananList"></div>
+    <button class="add-btn" onclick="tambahItemRT('rtMakananList','makanan')">+ Tambah Item Makanan/Minuman</button>
+    <div class="divider"></div>
+    <div id="ringkasanMakanan"></div>
+    <div class="hasil-box harian" style="grid-column:unset;margin-top:8px">
+      <div class="hasil-label">Total Makanan / Minggu</div>
+      <div class="hasil-nilai" id="rt-total-minggu">Rp 0</div>
+    </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinMakanan()">📋 Salin Catatan</button>
+    <button class="reset-btn" onclick="resetMakanan()">↺ Reset Makanan</button>
+  </div>
+
+  <!-- BAGIAN 2: NON-MAKANAN BULANAN -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>🏠 Pengeluaran Non-Makanan (Bulanan)</div>
+    <p class="hint" style="margin-bottom:12px">Listrik, air, pulsa, transportasi, pendidikan, kesehatan, dll.</p>
+    <div id="rtNonMakananList"></div>
+    <button class="add-btn" onclick="tambahItemRT('rtNonMakananList','nonmakanan')">+ Tambah Item Non-Makanan</button>
+    <div class="divider"></div>
+    <div id="ringkasanNonMakanan"></div>
+    <div class="hasil-box bulanan" style="grid-column:unset;margin-top:8px">
+      <div class="hasil-label">Total Non-Makanan / Bulan</div>
+      <div class="hasil-nilai" id="rt-nonmakanan-bulan">Rp 0</div>
+    </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinNonMakanan()">📋 Salin Catatan</button>
+    <button class="reset-btn" onclick="resetNonMakanan()">↺ Reset Non-Makanan</button>
+  </div>
+
+  <!-- BAGIAN 3: TAHUNAN NON-MAKANAN -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>📅 Pengeluaran Tahunan Non-Makanan</div>
+    <p class="hint" style="margin-bottom:12px">Pengeluaran yang sifatnya tahunan, bukan rutin bulanan: perbaikan rumah, pakaian, pajak kendaraan, dll. Isi langsung nominal per tahun.</p>
+    <div id="rtTahunanList"></div>
+    <button class="add-btn" onclick="tambahItemRTTahunan()">+ Tambah Item Tahunan</button>
+    <div class="divider"></div>
+    <div id="ringkasanTahunan"></div>
+    <div class="hasil-box tahunan" style="grid-column:unset;margin-top:8px">
+      <div class="hasil-label">Total Tahunan Non-Makanan / Tahun</div>
+      <div class="hasil-nilai" id="rt-tahunan-tahun">Rp 0</div>
+    </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTahunan()">📋 Salin Catatan</button>
+    <button class="reset-btn" onclick="resetTahunan()">↺ Reset Tahunan</button>
+  </div>
+</div>
+
+<!-- ===================== TAB: KONVERTER ===================== -->
+<div id="tab-konverter" class="section">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Konverter Cepat</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Konversi nominal antar periode waktu secara instan</p>
+
+    <div class="field">
+      <label>Hari Kerja per Minggu</label>
+      <div class="hari-grid" id="konvHariGrid">
+        <div class="hari-btn active" onclick="toggleKonvHari(this)">Sen</div>
+        <div class="hari-btn active" onclick="toggleKonvHari(this)">Sel</div>
+        <div class="hari-btn active" onclick="toggleKonvHari(this)">Rab</div>
+        <div class="hari-btn active" onclick="toggleKonvHari(this)">Kam</div>
+        <div class="hari-btn active" onclick="toggleKonvHari(this)">Jum</div>
+        <div class="hari-btn" onclick="toggleKonvHari(this)">Sab</div>
+        <div class="hari-btn" onclick="toggleKonvHari(this)">Min</div>
+      </div>
+      <p class="hint" id="konvHariHint" style="margin-top:6px">5 hari/minggu</p>
+    </div>
+
+    <div class="field">
+      <label>Masukkan Nominal</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="konvInput" placeholder="0" oninput="konversi()">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Satuan Sumber</label>
+      <div class="input-wrap">
+        <select id="konvDari" onchange="konversi()">
+          <option value="hari">Per Hari</option>
+          <option value="minggu">Per Minggu</option>
+          <option value="bulan" selected>Per Bulan</option>
+          <option value="tahun">Per Tahun</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="konvResult" style="display:none">
+      <div class="divider"></div>
+      <div id="konvRows"></div>
+    </div>
+  </div>
+
+  <!-- Kalkulator Margin -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Kalkulator Margin &amp; HPP</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Hitung margin keuntungan dari harga jual dan modal</p>
+    <div class="field">
+      <label>Harga Jual</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="hargaJual" placeholder="0" oninput="hitungMargin()">
+      </div>
+    </div>
+    <div class="field">
+      <label>Harga Pokok / Modal</label>
+      <div class="input-wrap">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" id="hargaModal" placeholder="0" oninput="hitungMargin()">
+      </div>
+    </div>
+    <div id="marginResult" style="display:none">
+      <div class="divider"></div>
+      <div id="marginRows"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TAB: RIWAYAT ===================== -->
+<div id="tab-riwayat" class="section">
+  <!-- Export bar — muncul otomatis kalau ada riwayat -->
+  <div id="exportBar" class="export-bar" style="display:none">
+    <button class="export-btn" onclick="exportRiwayat('json')">⬇️ Export JSON</button>
+    <button class="export-btn" onclick="exportRiwayat('csv')">⬇️ Export CSV</button>
+  </div>
+  <div id="riwayatList">
+    <div class="empty-state">
+      <span class="empty-icon">📭</span>
+      Belum ada data tersimpan.<br>Hitung dan simpan dulu dari tab Kalkulator.
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div id="toast">✓ Berhasil disalin!</div>
+
+<script>
+// ===== STATE =====
+let jenisUsaha = '';
+let biayaCounter = 0;
+let riwayat = JSON.parse(localStorage.getItem('se2026_riwayat') || '[]');
+
+/* =====================================================================
+ * RESPONDEN-BASED DATA MODEL (refactor)
+ * - respondenDB[KEY] = full record  (KEY = uppercase nama, trimmed)
+ * - respondenAktif   = current KEY  (null saat "Mulai Responden Baru" / awal)
+ * - Setiap simpanRiwayat* memerge field-field hasil ke profil aktif
+ * - Tab Riwayat menampilkan per-responden (bukan per-entry)
+ * ===================================================================== */
+let respondenDB     = JSON.parse(localStorage.getItem('se2026_respondenDB') || '{}');
+let respondenAktif  = localStorage.getItem('se2026_respondenAktif') || null;
+
+function persistRespondenDB() {
+  localStorage.setItem('se2026_respondenDB', JSON.stringify(respondenDB));
+  if (respondenAktif) localStorage.setItem('se2026_respondenAktif', respondenAktif);
+  else                localStorage.removeItem('se2026_respondenAktif');
+}
+
+// Normalisasi nama → uppercase trimmed (jadi key). Kosong → null.
+function namaToKey(nama) {
+  if (!nama) return null;
+  const t = String(nama).trim().toUpperCase();
+  return t.length ? t : null;
+}
+
+// Pastikan profil aktif ada — kalau belum, bikin object kosong dengan nama-nya.
+function ensureAktif(namaAsli) {
+  if (!respondenAktif) return null;
+  if (!respondenDB[respondenAktif]) {
+    respondenDB[respondenAktif] = {
+      _key: respondenAktif,
+      nama: namaAsli || respondenAktif,
+      waktuPertama: new Date().toLocaleString('id-ID'),
+      waktuUpdate:  new Date().toLocaleString('id-ID')
+    };
+  }
+  return respondenDB[respondenAktif];
+}
+
+// Merge updates ke profil aktif (dipakai oleh semua simpanRiwayat*).
+function mergeAktif(updates) {
+  if (!respondenAktif) {
+    // Coba derive dari namaUsaha field
+    const n = (document.getElementById('namaUsaha') || {}).value || '';
+    const k = namaToKey(n);
+    if (!k) { showToast('⚠️ Isi Nama Usaha dulu untuk membuat profil'); return false; }
+    respondenAktif = k;
+    ensureAktif(n);
+  }
+  const r = ensureAktif(updates.nama);
+  Object.assign(r, updates, { waktuUpdate: new Date().toLocaleString('id-ID') });
+  persistRespondenDB();
+  renderRespondenAktifBar();
+  return true;
+}
+
+// Update banner "Responden Aktif"
+function renderRespondenAktifBar() {
+  const bar = document.getElementById('respondenAktifBar');
+  if (!bar) return;
+  if (respondenAktif && respondenDB[respondenAktif]) {
+    const r = respondenDB[respondenAktif];
+    bar.classList.remove('kosong');
+    document.getElementById('raNama').textContent = r.nama;
+    const partsList = [];
+    if (r.kalkulator)  partsList.push('Kalkulator');
+    if (r.rincian26)   partsList.push('Biaya Usaha');
+    if (r.rincian28)   partsList.push('Aset');
+    if (r.belanjaRT)   partsList.push('Belanja RT');
+    document.getElementById('raInfo').textContent =
+      partsList.length ? '✓ ' + partsList.join(', ') + ' tersimpan' : 'Profil siap diisi…';
+  } else {
+    bar.classList.add('kosong');
+    document.getElementById('raNama').textContent = 'Belum ada responden aktif';
+    document.getElementById('raInfo').textContent = 'Isi Nama Usaha di bawah untuk memulai';
+  }
+}
+
+// Saat Nama Usaha diketik
+function onNamaUsahaInput() {
+  // Live preview di banner (tanpa commit)
+  const nama = document.getElementById('namaUsaha').value;
+  const key = namaToKey(nama);
+  if (!respondenAktif && key) {
+    // Belum ada profil aktif → preview saja, baru commit di onBlur
+    document.getElementById('raNama').textContent = nama + ' (akan dimulai…)';
+  }
+}
+
+// Saat field nama kehilangan fokus → commit profil aktif
+function onNamaUsahaBlur() {
+  const namaAsli = document.getElementById('namaUsaha').value.trim();
+  const newKey = namaToKey(namaAsli);
+  if (!newKey) return;
+
+  if (!respondenAktif) {
+    // Belum ada profil aktif → langsung jadikan aktif
+    respondenAktif = newKey;
+    ensureAktif(namaAsli);
+    persistRespondenDB();
+    renderRespondenAktifBar();
+    showToast('👤 Mulai responden: ' + namaAsli);
+    return;
+  }
+
+  if (respondenAktif === newKey) {
+    // Sama, tidak perubahan
+    if (respondenDB[respondenAktif]) {
+      respondenDB[respondenAktif].nama = namaAsli; // update casing
+      persistRespondenDB();
+      renderRespondenAktifBar();
+    }
+    return;
+  }
+
+  // Nama berubah ke profil yang BEDA — minta konfirmasi (Choice 4B)
+  const namaLama = (respondenDB[respondenAktif] || {}).nama || respondenAktif;
+  const punyaProgress = respondenDB[respondenAktif] && Object.keys(respondenDB[respondenAktif]).length > 4;
+
+  if (!punyaProgress) {
+    // Belum ada progress → langsung pindah
+    delete respondenDB[respondenAktif];
+    respondenAktif = newKey;
+    ensureAktif(namaAsli);
+    persistRespondenDB();
+    renderRespondenAktifBar();
+    showToast('👤 Berganti ke: ' + namaAsli);
+    return;
+  }
+
+  const msg = `Profil "${namaLama}" sedang aktif & sudah punya data.\n\n` +
+              `Ketik OK untuk SIMPAN profil tersebut & lanjut ke "${namaAsli}".\n` +
+              `Ketik Cancel untuk BATAL (nama akan dikembalikan).`;
+  if (confirm(msg)) {
+    // Simpan profil lama (sudah ada di DB), lalu pindah
+    respondenAktif = newKey;
+    ensureAktif(namaAsli);
+    persistRespondenDB();
+    renderRespondenAktifBar();
+    showToast('💾 Disimpan. Mulai responden: ' + namaAsli);
+  } else {
+    // Batal — kembalikan nama
+    document.getElementById('namaUsaha').value = namaLama;
+  }
+}
+
+// Tombol "Mulai Responden Baru"
+function mulaiRespondenBaru() {
+  const punyaAktif = respondenAktif && respondenDB[respondenAktif] && Object.keys(respondenDB[respondenAktif]).length > 4;
+  if (punyaAktif) {
+    const namaLama = respondenDB[respondenAktif].nama;
+    if (!confirm(`Profil "${namaLama}" akan disimpan otomatis. Mulai responden baru dengan form kosong?`)) return;
+  }
+  respondenAktif = null;
+  persistRespondenDB();
+  resetForm();
+  // Juga reset semua tab lain
+  try { resetMakanan();    } catch(e){}
+  try { resetNonMakanan(); } catch(e){}
+  try { resetTahunan();    } catch(e){}
+  try { resetAset();       } catch(e){}
+  renderRespondenAktifBar();
+  showTab('kalkulator');
+  showToast('✨ Siap untuk responden baru');
+}
+
+// ===== SALIN NOMINAL (tab Biaya Usaha) =====
+// Strip semua titik dari teks tampilan & copy ke clipboard. Toast confirm.
+function salinNominal(elId, label) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  // Ambil angka, hilangkan "Rp ", titik, dan spasi
+  const raw = el.textContent.replace(/Rp\s*/i, '').replace(/\./g, '').replace(/\s/g, '').trim();
+  const num = parseInt(raw, 10);
+  if (!num || isNaN(num)) { showToast('⚠️ Belum ada angka untuk disalin'); return; }
+  copyToClipboard(String(num));
+  showToast(`📋 Nominal ${label} disalin: ${num}`);
+}
+
+// ===== SYNC subtotal Kalkulator → Summary di tab Biaya Usaha =====
+function syncBiayaUsahaSummary() {
+  const get = (id) => (document.getElementById(id) || {}).textContent || 'Rp 0';
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('sum26a', get('bu26a-subtotal'));
+  set('sum26b', get('bu26b-subtotal'));
+  set('sum26c', get('bu26c-subtotal'));
+  set('sum26d', get('bu26d-subtotal'));
+  set('sum26e', get('bu26e-subtotal'));
+  set('sum26f', get('bu26f'));
+  set('sum26-terbilang', (document.getElementById('bu26f-terbilang') || {}).textContent || '');
+}
+
+// ===== MIGRASI data lama (array riwayat → respondenDB keyed by nama) =====
+function migrateOldRiwayat() {
+  if (!riwayat || !riwayat.length) return 0;
+  let migrated = 0;
+  riwayat.forEach(r => {
+    const namaAsli = r.nama || r.nomorKeluarga || 'Tanpa Nama #' + r.id;
+    const key = namaToKey(namaAsli);
+    if (!key) return;
+    if (!respondenDB[key]) {
+      respondenDB[key] = { _key: key, nama: namaAsli, waktuPertama: r.waktu, waktuUpdate: r.waktu };
+      migrated++;
+    }
+    const tgt = respondenDB[key];
+    if (r.tipe === 'kalkulator' || !r.tipe) {
+      tgt.kalkulator = r;
+      tgt.pekerjaan  = r.pekerjaan || tgt.pekerjaan;
+      tgt.jenis      = r.jenis     || tgt.jenis;
+      tgt.kbli       = r.kbli      || tgt.kbli;
+    } else if (r.tipe === 'biayausaha') {
+      tgt.rincian26 = r;
+    } else if (r.tipe === 'nilaiAset') {
+      tgt.rincian28 = r;
+    } else if (r.tipe === 'makanan' || r.tipe === 'nonmakanan' || r.tipe === 'tahunanrt') {
+      tgt.belanjaRT = tgt.belanjaRT || {};
+      const k = r.tipe === 'tahunanrt' ? 'tahunan' : r.tipe;
+      tgt.belanjaRT[k] = r;
+    }
+  });
+  persistRespondenDB();
+  return migrated;
+}
+
+// ===== TAB =====
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  // Aktifkan tombol tab yang cocok (cari by onclick attr, robust ke pemanggilan via JS)
+  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(
+    b => b.getAttribute('onclick') === `showTab('${tab}')`
+  );
+  if (btn) btn.classList.add('active');
+  if (tab === 'riwayat') renderRiwayat();
+}
+
+// ===== JENIS USAHA — data KBLI per jenis =====
+const JENIS_KBLI = {
+  dagang:       'G — Perdagangan Besar & Eceran (46-47)',
+  kuliner:      'I — Penyediaan Makan Minum (56)',
+  jasa:         'S — Jasa Lainnya (95-96)',
+  produksi:     'C — Industri Pengolahan (10-33)',
+  pertanian:    'A — Pertanian, Kehutanan (01-02)',
+  peternakan:   'A — Pertanian, Peternakan (01.4-01.5)',
+  konstruksi:   'F — Konstruksi (41-43)',
+  transportasi: 'H — Transportasi & Pergudangan (49-53)',
+  penginapan:   'I — Akomodasi (55)',
+  pendidikan:   'P — Jasa Pendidikan (85)',
+  kesehatan:    'Q — Jasa Kesehatan (86-88)',
+  kerajinan:    'C — Industri Kerajinan (13-15, 31-32)',
+  lainnya:      ''
+};
+
+function pilihJenis(el, jenis) {
+  // Sinkronkan dropdown (kalau dipanggil bukan dari dropdown)
+  const sel = document.getElementById('jenisUsahaSelect');
+  if (sel && sel.value !== jenis) sel.value = jenis;
+
+  jenisUsaha = jenis;
+
+  const tampilkanMusim = jenis === 'pertanian' || jenis === 'peternakan';
+  document.getElementById('musimSection').style.display = tampilkanMusim ? 'block' : 'none';
+
+  if (jenis === 'peternakan') {
+    document.getElementById('labelMusim').textContent = 'Jumlah Bulan Ada Panen/Jual Ternak dalam 1 Tahun';
+    document.getElementById('hintMusim').innerHTML = 'Contoh: ayam broiler dipanen 6x setahun, tiap periode ±1 bulan → isi <b>6</b>. Bukan bulan ke berapa terjadinya, tapi total berapa bulan dalam setahun ada hasil panen/jual.';
+  } else if (jenis === 'pertanian') {
+    document.getElementById('labelMusim').textContent = 'Jumlah Bulan Panen dalam 1 Tahun';
+    document.getElementById('hintMusim').innerHTML = 'Contoh: jika panen 2x setahun, masing-masing perlu 2 bulan kerja → isi <b>4</b> (bukan bulan ke berapa terjadinya, tapi total berapa bulan ada hasil panen)';
+  }
+
+  // KBLI tag — dari JENIS_KBLI map
+  const kbliEl = document.getElementById('kbliTag');
+  if (kbliEl) {
+    const kbli = JENIS_KBLI[jenis] || '';
+    if (kbli) {
+      kbliEl.innerHTML = `<strong>📂 Kategori KBLI:</strong> ${kbli}`;
+      kbliEl.style.display = 'block';
+    } else {
+      kbliEl.style.display = 'none';
+    }
+  }
+
+  hitungOtomatis();
+}
+
+// ===== HARI KERJA =====
+function toggleHari(el) {
+  el.classList.toggle('active');
+  updateHariHint();
+  hitungOtomatis();
+}
+
+function getHariKerja() {
+  return document.querySelectorAll('#hariGrid .hari-btn.active').length;
+}
+
+function updateHariHint() {
+  const n = getHariKerja();
+  const perBulan = Math.round(n * 52 / 12);
+  document.getElementById('hariHint').textContent = `${n} hari kerja / minggu → ~${perBulan} hari/bulan`;
+}
+
+// ===== SATUAN WAKTU =====
+function updateSatuan() {
+  const s = document.getElementById('satuanWaktu').value;
+  const labels = { hari: 'per Hari', minggu: 'per Minggu', bulan: 'per Bulan' };
+  const hints = {
+    hari: 'Masukkan total penjualan rata-rata per hari',
+    minggu: 'Masukkan total penjualan rata-rata per minggu',
+    bulan: 'Masukkan total penjualan rata-rata per bulan'
+  };
+  document.getElementById('labelOmzet').textContent = 'Omzet ' + labels[s];
+  document.getElementById('hintOmzet').textContent = hints[s];
+  document.getElementById('hariKerjaSection').style.display = s === 'bulan' ? 'none' : 'block';
+  hitungOtomatis();
+}
+
+// ===== BIAYA =====
+function tambahBiaya(nama = '', nilai = '') {
+  biayaCounter++;
+  const id = biayaCounter;
+  const div = document.createElement('div');
+  div.className = 'biaya-row';
+  div.id = 'biaya-' + id;
+  div.innerHTML = `
+    <div class="input-wrap biaya-nama">
+      <input type="text" placeholder="Nama biaya" value="${nama}" oninput="hitungOtomatis()">
+    </div>
+    <div class="input-wrap biaya-nom">
+      <span class="input-prefix">Rp</span>
+      <input type="text" inputmode="numeric" class="rp-input" placeholder="0" value="${nilai}" oninput="hitungOtomatis()">
+    </div>
+    <button class="del-btn" onclick="hapusBiaya(${id})">×</button>
+    <span class="yearly-hint empty" data-yearly-for="${id}">= Rp 0 / tahun</span>
+  `;
+  document.getElementById('biayaList').appendChild(div);
+  hitungOtomatis();
+}
+
+function hapusBiaya(id) {
+  const el = document.getElementById('biaya-' + id);
+  if (el) el.remove();
+  hitungOtomatis();
+}
+
+// Update kolom "/tahun" tiap item biaya berdasarkan satuan waktu omzet
+function updateBiayaYearly() {
+  const mult = getMultiplier();
+  document.querySelectorAll('#biayaList .biaya-row').forEach(row => {
+    const nominal = parseRp(row.querySelectorAll('input')[1].value);
+    const perBulan = nominal * mult.toBulan;
+    const perTahun = perBulan * 12;
+    const hint = row.querySelector('.yearly-hint');
+    if (hint) {
+      if (nominal > 0) {
+        hint.textContent = '= ' + formatRp(perTahun) + ' / tahun';
+        hint.classList.remove('empty');
+      } else {
+        hint.classList.add('empty');
+      }
+    }
+  });
+}
+
+function getBiayaList() {
+  const rows = document.querySelectorAll('#biayaList .biaya-row');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      nama: inputs[0].value || 'Biaya lain',
+      nilai: parseRp(inputs[1].value)
+    };
+  });
+}
+
+// ===== KONVERSI WAKTU =====
+function getMultiplier() {
+  const satuan = document.getElementById('satuanWaktu').value;
+  const hariPerMinggu = getHariKerja() || 5;
+  const hariPerBulan = Math.round(hariPerMinggu * 52 / 12);
+
+  if (satuan === 'hari') return { toHari: 1, toBulan: hariPerBulan, toTahun: hariPerBulan * 12 };
+  if (satuan === 'minggu') return { toHari: 1 / hariPerMinggu, toBulan: hariPerBulan / hariPerMinggu, toTahun: hariPerBulan * 12 / hariPerMinggu };
+  if (satuan === 'bulan') return {
+    toHari: 1 / hariPerBulan,
+    toBulan: 1,
+    toTahun: 12
+  };
+  return { toHari: 1, toBulan: 30, toTahun: 360 };
+}
+
+// ===== HITUNG =====
+function hitungOtomatis() {
+  // auto update hints only
+  updateHariHint();
+  updateBiayaYearly();
+  updateTkSummary();
+  try { hitungBiayaUsaha(); } catch(e) {} // sync 26.a otomatis dari Tenaga Kerja
+}
+
+// Update ringkasan Tenaga Kerja setahun
+function updateTkSummary() {
+  const n      = parseFloat(document.getElementById('jumlahKaryawan').value) || 0;
+  const gaji   = parseRp((document.getElementById('gajiPerOrang')   || {}).value || '');
+  const jamsos = parseRp((document.getElementById('jamsosPerOrang') || {}).value || '');
+  const thr    = parseRp((document.getElementById('thrPerOrang')    || {}).value || '');
+
+  const gajiTh   = gaji   * 12 * n;
+  const jamsosTh = jamsos * 12 * n;
+  const thrTh    = thr         * n;
+  const totalTh  = gajiTh + jamsosTh + thrTh;
+
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = formatRp(v); };
+  set('tkGajiTahun',   gajiTh);
+  set('tkJamsosTahun', jamsosTh);
+  set('tkThrTahun',    thrTh);
+  set('tkTotalTahun',  totalTh);
+
+  const summary = document.getElementById('tkSummary');
+  if (summary) summary.style.display = (n > 0 && totalTh > 0) ? 'block' : 'none';
+}
+
+function hitung() {
+  const omzet = parseRp(document.getElementById('omzet').value);
+  if (!omzet) { showToast('⚠️ Masukkan omzet terlebih dahulu'); return; }
+
+  const mult = getMultiplier();
+  const omzetHari = omzet * mult.toHari;
+  const omzetBulan = omzet * mult.toBulan;
+  const omzetTahun = omzet * mult.toTahun;
+
+  // Biaya operasional
+  const biayaItems = getBiayaList();
+  const totalBiayaOps = biayaItems.reduce((s, b) => s + b.nilai, 0);
+  const biayaOpsHari = totalBiayaOps * mult.toHari;
+  const biayaOpsBulan = totalBiayaOps * mult.toBulan;
+
+  // Gaji + Jaminan Sosial + Bonus/THR (selalu per bulan untuk gaji & jamsos; THR tahunan)
+  const nKaryawan    = parseFloat(document.getElementById('jumlahKaryawan').value) || 0;
+  const gajiPerOrang = parseRp(document.getElementById('gajiPerOrang').value);
+  const jamsosPerOrang = parseRp((document.getElementById('jamsosPerOrang') || {}).value || '');
+  const thrPerOrang    = parseRp((document.getElementById('thrPerOrang')    || {}).value || '');
+  // Total per bulan = (gaji + jamsos) × jumlah karyawan, plus THR setahun dibagi 12
+  const totalGajiBulan = nKaryawan * (gajiPerOrang + jamsosPerOrang + thrPerOrang / 12);
+  const totalGajiHari  = totalGajiBulan / (mult.toBulan || 22);
+
+  // Pertanian/Peternakan: faktor musim
+  let faktorMusim = 1;
+  if (jenisUsaha === 'pertanian' || jenisUsaha === 'peternakan') {
+    const bulanPanen = parseFloat(document.getElementById('bulanPanen').value) || 4;
+    faktorMusim = bulanPanen / 12;
+  }
+
+  // === BIAYA = Total 26.a-e (per TAHUN) ===
+  // Pastikan 26.a-e ter-hitung dulu (dari Tenaga Kerja + sub-items 26.b-e)
+  hitungBiayaUsaha();
+  const r26       = window._lastBiayaUsaha || {};
+  const total26   = r26.total || 0;          // a + b + c + d + e (semua /tahun)
+  const totalBiayaTahun = total26;
+  const totalBiayaBulan = totalBiayaTahun / 12;
+  const totalBiayaHari  = totalBiayaBulan / (mult.toBulan || 22);
+
+  // Laba bersih per ketentuan: omzet/tahun − total 26.a-e (faktor musim diterapkan ke omzet)
+  const labaHari  = (omzetHari  - totalBiayaHari)  * faktorMusim;
+  const labaBulan = (omzetBulan - totalBiayaBulan) * faktorMusim;
+  const labaTahun = (omzetTahun * faktorMusim) - totalBiayaTahun;
+
+  // Render
+  document.getElementById('res-omzet-hari').textContent = formatRp(omzetHari);
+  document.getElementById('res-omzet-bulan').textContent = formatRp(omzetBulan);
+  document.getElementById('res-omzet-tahun').textContent = formatRp(omzetTahun * faktorMusim);
+  document.getElementById('res-omzet-terbilang').textContent = terbilang(omzetTahun * faktorMusim);
+
+  document.getElementById('res-laba-hari').textContent = formatRp(labaHari);
+  document.getElementById('res-laba-bulan').textContent = formatRp(labaBulan);
+  document.getElementById('res-laba-tahun').textContent = formatRp(labaTahun);
+  document.getElementById('res-laba-terbilang').textContent = terbilang(labaTahun);
+
+  // Ringkasan biaya — pakai breakdown 26.a-e per TAHUN
+  let ringHTML = '';
+  ringHTML += `<div class="ringkasan-row"><span class="rk-label">Omzet / Tahun</span><span class="rk-val plus">${formatRp(omzetTahun * faktorMusim)}</span></div>`;
+  if (r26.a > 0) ringHTML += `<div class="ringkasan-row"><span class="rk-label">− 26.a Upah, Gaji & Jaminan Sosial</span><span class="rk-val minus">${formatRp(r26.a)}</span></div>`;
+  if (r26.b > 0) ringHTML += `<div class="ringkasan-row"><span class="rk-label">− 26.b Biaya Produksi</span><span class="rk-val minus">${formatRp(r26.b)}</span></div>`;
+  if (r26.c > 0) ringHTML += `<div class="ringkasan-row"><span class="rk-label">− 26.c Sewa & Jasa Lainnya</span><span class="rk-val minus">${formatRp(r26.c)}</span></div>`;
+  if (r26.d > 0) ringHTML += `<div class="ringkasan-row"><span class="rk-label">− 26.d Biaya Operasional</span><span class="rk-val minus">${formatRp(r26.d)}</span></div>`;
+  if (r26.e > 0) ringHTML += `<div class="ringkasan-row"><span class="rk-label">− 26.e Biaya Non-Operasional</span><span class="rk-val minus">${formatRp(r26.e)}</span></div>`;
+  ringHTML += `<div class="ringkasan-row"><span class="rk-label" style="font-weight:700;color:var(--text)">26.f Total Biaya / Tahun</span><span class="rk-val minus" style="font-size:14px">${formatRp(totalBiayaTahun)}</span></div>`;
+  document.getElementById('ringkasanBiaya').innerHTML = ringHTML;
+
+  const labelMap = { dagang:'Dagang', kuliner:'Kuliner', jasa:'Jasa', produksi:'Produksi', pertanian:'Pertanian', peternakan:'Peternakan', konstruksi:'Konstruksi', transportasi:'Transportasi', penginapan:'Penginapan', pendidikan:'Pendidikan', kesehatan:'Kesehatan', kerajinan:'Kerajinan', lainnya:'Lainnya' };
+  document.getElementById('badgeJenis').textContent = jenisUsaha ? labelMap[jenisUsaha] : 'Umum';
+
+  // Warning rugi jika laba tahunan negatif
+  const rugiEl = document.getElementById('rugiWarning');
+  if (rugiEl) {
+    if (labaTahun < 0) {
+      rugiEl.textContent = '⚠️ Hasil menunjukkan RUGI — periksa kembali nilai omzet & biaya. Mungkin biaya terlalu besar atau omzet salah satuan waktu.';
+      rugiEl.style.display = 'block';
+    } else {
+      rugiEl.style.display = 'none';
+    }
+  }
+
+  // Ambil KBLI dari card terpilih
+  const sel = document.querySelector('.jenis-card.selected');
+  const kbliVal = sel ? (sel.getAttribute('data-kbli') || '') : '';
+  const pekVal  = (document.getElementById('pekerjaanResponden') || {}).value || '';
+
+  document.getElementById('hasilSection').style.display = 'block';
+  document.getElementById('hasilSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Store for save — termasuk Rincian 26.b-e agar ikut tersimpan & bisa di-edit ulang
+  window._lastHasil = {
+    tipe: 'kalkulator',
+    nomorKeluarga: document.getElementById('nomorKeluarga').value || '-',
+    nomorBangunan: document.getElementById('nomorBangunan').value || '-',
+    nama: document.getElementById('namaUsaha').value || 'Tanpa Nama',
+    pekerjaan: pekVal,
+    jenis: jenisUsaha || 'lainnya',
+    kbli: kbliVal,
+    satuan: document.getElementById('satuanWaktu').value,
+    omzet, omzetHari, omzetBulan, omzetTahun: omzetTahun * faktorMusim,
+    totalBiayaBulan, labaBulan, labaTahun,
+    biayaItems, nKaryawan, gajiPerOrang, jamsosPerOrang, thrPerOrang,
+    // === Rincian 26.a-e (per tahun untuk subtotal, raw items per bulan) ===
+    r26a: r26.a || 0,
+    r26b: r26.b || 0,
+    r26c: r26.c || 0,
+    r26d: r26.d || 0,
+    r26e: r26.e || 0,
+    r26total: r26.total || 0,
+    items26B: r26.itemsB || [],
+    items26C: r26.itemsC || [],
+    items26D: r26.itemsD || [],
+    items26E: r26.itemsE || [],
+    rugi: labaTahun < 0,
+    waktu: new Date().toLocaleString('id-ID')
+  };
+}
+
+// ===== SALIN =====
+function salinHasil() {
+  if (!window._lastHasil) return;
+  const h = window._lastHasil;
+  const teks = `=== KALKULATOR USAHA SE2026 ===
+Nama Usaha : ${h.nama}
+Pekerjaan  : ${h.pekerjaan || '-'}
+Jenis      : ${h.jenis}${h.kbli ? '  (' + h.kbli + ')' : ''}
+Waktu      : ${h.waktu}
+
+OMZET
+  Per Hari   : ${formatRp(h.omzetHari)}
+  Per Bulan  : ${formatRp(h.omzetBulan)}
+  Per Tahun  : ${formatRp(h.omzetTahun)}
+
+TOTAL BIAYA/BULAN : ${formatRp(h.totalBiayaBulan)}
+
+LABA BERSIH${h.rugi ? '  ⚠ RUGI' : ''}
+  Per Bulan  : ${formatRp(h.labaBulan)}
+  Per Tahun  : ${formatRp(h.labaTahun)}
+  (${terbilang(h.labaTahun)})
+================================`;
+  copyToClipboard(teks);
+}
+
+// ===== SIMPAN RIWAYAT =====
+function simpanRiwayat() {
+  if (!window._lastHasil) return;
+  pushOrReplaceRiwayat({ ...window._lastHasil });
+
+  // Auto-simpan juga Rincian 26 (a-e) ke profil responden — supaya tidak hilang
+  // dan CSV export wide-format ikut menyertakan breakdown 26.b-e.
+  const h26 = window._lastBiayaUsaha;
+  if (h26 && (h26.total > 0 || (h26.itemsB && h26.itemsB.length) || (h26.itemsC && h26.itemsC.length) || (h26.itemsD && h26.itemsD.length) || (h26.itemsE && h26.itemsE.length))) {
+    const data26 = {
+      tipe: 'biayausaha',
+      nama: window._lastHasil.nama,
+      ...h26,
+      waktu: new Date().toLocaleString('id-ID')
+    };
+    // Tulis ke respondenDB[key].rincian26 tanpa membuat entri riwayat baru
+    const key = namaToKey(window._lastHasil.nama);
+    if (key) {
+      const r = ensureAktif(window._lastHasil.nama);
+      r.rincian26 = data26;
+      r.waktuUpdate = data26.waktu;
+      persistRespondenDB();
+    }
+  }
+
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+function simpanRiwayatBiayaUsaha() {
+  const h = window._lastBiayaUsaha;
+  if (!h || !h.total) { showToast('⚠️ Isi dulu rinciannya'); return; }
+  const nama = getCurrentNama();
+  if (!nama) { showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu'); return; }
+  pushOrReplaceRiwayat({
+    tipe: 'biayausaha',
+    nama,
+    ...h,
+    waktu: new Date().toLocaleString('id-ID')
+  });
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+// ===== HELPER: tambah baru atau ganti yang sedang diedit + merge ke responden aktif =====
+
+// Ambil nama responden aktif dari berbagai sumber (untuk save di tab non-Kalkulator)
+function getCurrentNama() {
+  // Prioritas: input #namaUsaha (Kalkulator) > respondenDB aktif > kosong
+  const inputNama = (document.getElementById('namaUsaha') || {}).value || '';
+  if (inputNama.trim()) return inputNama.trim();
+  if (respondenAktif && respondenDB[respondenAktif] && respondenDB[respondenAktif].nama) {
+    return respondenDB[respondenAktif].nama;
+  }
+  return '';
+}
+
+// ===== MASTER SAVE: simpan semua tab sekaligus (Kalkulator + Belanja RT + Aset) =====
+function simpanSemuaResponden() {
+  const nama = getCurrentNama();
+  if (!nama) {
+    showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu');
+    showTab('kalkulator');
+    setTimeout(() => {
+      const el = document.getElementById('namaUsaha');
+      if (el) el.focus();
+    }, 400);
+    return;
+  }
+
+  // Pastikan respondenAktif ter-set
+  const key = namaToKey(nama);
+  if (key && !respondenAktif) {
+    respondenAktif = key;
+    ensureAktif(nama);
+  }
+
+  const sectionsSaved = [];
+
+  // 1. KALKULATOR — hanya jika omzet > 0
+  try {
+    const omzetVal = parseRp((document.getElementById('omzet') || {}).value || '');
+    if (omzetVal > 0) {
+      hitung();
+      if (window._lastHasil) {
+        pushOrReplaceRiwayat({ ...window._lastHasil });
+        // Sub-merge: rincian26 ke profil responden
+        const h26 = window._lastBiayaUsaha;
+        if (h26 && (h26.total > 0 || (h26.itemsB && h26.itemsB.length) || (h26.itemsC && h26.itemsC.length) || (h26.itemsD && h26.itemsD.length) || (h26.itemsE && h26.itemsE.length))) {
+          const r = ensureAktif(nama);
+          if (r) {
+            r.rincian26 = { tipe: 'biayausaha', nama, ...h26, waktu: new Date().toLocaleString('id-ID') };
+            r.waktuUpdate = r.rincian26.waktu;
+            persistRespondenDB();
+          }
+        }
+        sectionsSaved.push('Kalkulator');
+      }
+    }
+  } catch (e) { console.warn('Save Kalkulator:', e); }
+
+  // 2. BELANJA RT — Makanan
+  try {
+    if (document.querySelectorAll('#rtMakananList .rt-row').length > 0) {
+      hitungMakanan();
+      const h = window._lastMakanan;
+      if (h && h.items && h.items.length) {
+        pushOrReplaceRiwayat({ tipe: 'makanan', nama, ...h });
+        sectionsSaved.push('Makanan');
+      }
+    }
+  } catch (e) { console.warn('Save Makanan:', e); }
+
+  // 3. BELANJA RT — Non-Makanan
+  try {
+    if (document.querySelectorAll('#rtNonMakananList .rt-row').length > 0) {
+      hitungNonMakanan();
+      const h = window._lastNonMakanan;
+      if (h && h.items && h.items.length) {
+        pushOrReplaceRiwayat({ tipe: 'nonmakanan', nama, ...h });
+        sectionsSaved.push('Non-Makanan');
+      }
+    }
+  } catch (e) { console.warn('Save NonMakanan:', e); }
+
+  // 4. BELANJA RT — Tahunan
+  try {
+    if (document.querySelectorAll('#rtTahunanList .rt-row').length > 0) {
+      hitungTahunan();
+      const h = window._lastTahunan;
+      if (h && h.items && h.items.length) {
+        pushOrReplaceRiwayat({ tipe: 'tahunanrt', nama, ...h });
+        sectionsSaved.push('Tahunan');
+      }
+    }
+  } catch (e) { console.warn('Save Tahunan:', e); }
+
+  // 5. NILAI ASET (Rincian 28)
+  try {
+    if (typeof hitungAset === 'function') hitungAset();
+    const h = window._lastAset;
+    if (h && h.total > 0) {
+      pushOrReplaceRiwayat({ tipe: 'nilaiAset', nama, ...h });
+      sectionsSaved.push('Nilai Aset');
+    }
+  } catch (e) { console.warn('Save Aset:', e); }
+
+  finishEdit();
+
+  if (sectionsSaved.length === 0) {
+    showToast('⚠️ Belum ada data untuk disimpan. Isi minimal Omzet atau item Belanja RT.');
+  } else {
+    showToast(`✅ Tersimpan: ${sectionsSaved.join(' • ')}`);
+  }
+}
+
+function pushOrReplaceRiwayat(data) {
+  if (window._editingId) {
+    const idx = riwayat.findIndex(x => x.id === window._editingId);
+    if (idx >= 0) {
+      riwayat[idx] = { ...data, id: window._editingId };
+    } else {
+      riwayat.unshift({ ...data, id: Date.now() });
+    }
+  } else {
+    riwayat.unshift({ ...data, id: Date.now() });
+  }
+  if (riwayat.length > 30) riwayat = riwayat.slice(0, 30);
+  localStorage.setItem('se2026_riwayat', JSON.stringify(riwayat));
+
+  // === Auto-merge ke profil Responden Aktif (new data model) ===
+  // Tentukan slot berdasarkan tipe data
+  const tipe = data.tipe || 'kalkulator';
+  let slot = 'kalkulator';
+  if      (tipe === 'biayausaha')                                       slot = 'rincian26';
+  else if (tipe === 'nilaiAset')                                        slot = 'rincian28';
+  else if (tipe === 'makanan' || tipe === 'nonmakanan' || tipe === 'tahunanrt') slot = 'belanjaRT.' + (tipe === 'tahunanrt' ? 'tahunan' : tipe);
+
+  // Pastikan respondenAktif terset — kalau belum, derive dari data.nama
+  if (!respondenAktif) {
+    const key = namaToKey(data.nama);
+    if (key) { respondenAktif = key; ensureAktif(data.nama); }
+  }
+  if (respondenAktif) {
+    const r = ensureAktif(data.nama);
+    if (slot.startsWith('belanjaRT.')) {
+      r.belanjaRT = r.belanjaRT || {};
+      r.belanjaRT[slot.split('.')[1]] = data;
+    } else {
+      r[slot] = data;
+    }
+    // Field umum yang berguna untuk tampilan & export
+    if (data.nama)     r.nama     = data.nama;
+    if (data.pekerjaan)r.pekerjaan= data.pekerjaan;
+    if (data.jenis)    r.jenis    = data.jenis;
+    if (data.kbli)     r.kbli     = data.kbli;
+    if (data.satuan)   r.satuan   = data.satuan;
+    r.waktuUpdate = new Date().toLocaleString('id-ID');
+    persistRespondenDB();
+    renderRespondenAktifBar();
+  }
+}
+
+function finishEdit() {
+  if (window._editingId) {
+    window._editingId = null;
+    hideEditBanner();
+  }
+}
+
+// ===== RENDER RIWAYAT =====
+function renderRiwayat() {
+  const container = document.getElementById('riwayatList');
+  const expBar = document.getElementById('exportBar');
+  const respKeys = Object.keys(respondenDB);
+  if (!riwayat.length && !respKeys.length) {
+    if (expBar) expBar.style.display = 'none';
+    container.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span>Belum ada data tersimpan.<br>Hitung dan simpan dulu dari tab lainnya.</div>`;
+    return;
+  }
+  if (expBar) expBar.style.display = 'flex';
+
+  // ===== Bagian per-Responden (utama) =====
+  let respHtml = '';
+  if (respKeys.length) {
+    // Sort by waktuUpdate desc
+    const sorted = respKeys
+      .map(k => respondenDB[k])
+      .sort((a, b) => (new Date(b.waktuUpdate || 0).getTime()) - (new Date(a.waktuUpdate || 0).getTime()));
+    respHtml = `<div style="margin-bottom:14px"><div style="font-weight:700;font-size:13px;color:var(--bps-blue);margin-bottom:8px;letter-spacing:0.3px">👥 RESPONDEN TERSIMPAN (${sorted.length})</div>`;
+    sorted.forEach(r => {
+      const did = 'resp-' + r._key.replace(/[^a-z0-9]/gi,'_');
+      const k = r._key;
+      const parts = [];
+      if (r.kalkulator) parts.push('🧮 Kalk');
+      if (r.rincian26)  parts.push('📊 R26');
+      if (r.rincian28)  parts.push('🏠 Aset');
+      if (r.belanjaRT)  parts.push('🛍️ RT');
+      const laba   = r.kalkulator ? formatRp(r.kalkulator.labaTahun || 0) : '-';
+      const totalR26 = r.rincian26 ? formatRp(r.rincian26.total || 0) : '-';
+
+      let detailHtml = '';
+      if (r.kalkulator) {
+        const k2 = r.kalkulator;
+        detailHtml += `<div class="ri-detail-row"><b>Kalkulator</b><span></span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>Jenis</span><span>${k2.jenis || '-'}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>Omzet/Bulan</span><span>${formatRp(k2.omzetBulan||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>Omzet/Tahun</span><span>${formatRp(k2.omzetTahun||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row" style="color:var(--green);font-weight:600"><span>Laba/Tahun</span><span>${formatRp(k2.labaTahun||0)}</span></div>`;
+      }
+      if (r.rincian26) {
+        const x = r.rincian26;
+        detailHtml += `<div class="ri-detail-row" style="margin-top:6px"><b>Rincian 26 (Biaya Usaha)</b><span></span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>26.a Upah/Gaji</span><span>${formatRp(x.a||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>26.b Produksi</span><span>${formatRp(x.b||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>26.c Sewa/Jasa</span><span>${formatRp(x.c||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>26.d Operasional</span><span>${formatRp(x.d||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>26.e Non-Op</span><span>${formatRp(x.e||0)}</span></div>`;
+        detailHtml += `<div class="ri-detail-row" style="color:var(--bps-blue);font-weight:700"><span>26.f TOTAL</span><span>${formatRp(x.total||0)}</span></div>`;
+      }
+      if (r.rincian28) {
+        const x = r.rincian28;
+        detailHtml += `<div class="ri-detail-row" style="margin-top:6px"><b>Rincian 28 (Nilai Aset)</b><span></span></div>`;
+        detailHtml += `<div class="ri-detail-row"><span>28.a-e Total</span><span style="color:var(--bps-blue);font-weight:700">${formatRp(x.total||0)}</span></div>`;
+      }
+      if (r.belanjaRT) {
+        detailHtml += `<div class="ri-detail-row" style="margin-top:6px"><b>Belanja RT</b><span></span></div>`;
+        if (r.belanjaRT.makanan)    detailHtml += `<div class="ri-detail-row"><span>Makanan/Minggu</span><span>${formatRp(r.belanjaRT.makanan.totalMinggu||0)}</span></div>`;
+        if (r.belanjaRT.nonmakanan) detailHtml += `<div class="ri-detail-row"><span>Non-Makanan/Bulan</span><span>${formatRp(r.belanjaRT.nonmakanan.totalBulan||0)}</span></div>`;
+        if (r.belanjaRT.tahunan)    detailHtml += `<div class="ri-detail-row"><span>Tahunan</span><span>${formatRp(r.belanjaRT.tahunan.totalTahun||0)}</span></div>`;
+      }
+
+      respHtml += `
+        <div class="riwayat-item" style="border-left:4px solid var(--bps-blue);background:var(--green-bg)">
+          <div class="ri-header" onclick="toggleDetail('${did}')" style="cursor:pointer">
+            <div>
+              <div class="ri-nama">👤 ${r.nama}</div>
+              <div class="ri-waktu">${r.waktuUpdate || r.waktuPertama || '-'}</div>
+              <div class="ri-jenis" style="margin-top:4px">${parts.join(' · ') || '<i>Profil kosong</i>'} · Laba/Th: <b>${laba}</b> · R26: <b>${totalR26}</b></div>
+            </div>
+            <span id="arr-${did}" style="color:var(--muted);font-size:18px;transition:transform 0.2s">▼</span>
+          </div>
+          <div id="${did}" class="ri-detail-body" style="display:none">${detailHtml || '<i>Belum ada data</i>'}</div>
+          <div class="ri-footer" style="margin-top:10px">
+            <button class="ri-btn edit" onclick='editResponden("${k.replace(/"/g,'\\"')}")'>✏️ Buka</button>
+            <button class="ri-btn del" onclick='hapusResponden("${k.replace(/"/g,'\\"')}")'>🗑️ Hapus</button>
+          </div>
+        </div>`;
+    });
+    respHtml += `</div>`;
+  }
+  container.innerHTML = respHtml;
+  return; // Skip old per-entry list (data lama otomatis ter-migrasi ke responden)
+}
+
+// Tambah handler untuk responden card
+function editResponden(key) {
+  if (!respondenDB[key]) return;
+  respondenAktif = key;
+  persistRespondenDB();
+  renderRespondenAktifBar();
+  const r = respondenDB[key];
+  document.getElementById('namaUsaha').value = r.nama;
+
+  // === Restore SEMUA tab dari profil responden ===
+  // Kalkulator
+  if (r.kalkulator) {
+    try { populateKalkulator(r.kalkulator); } catch(e) { console.warn('populateKalkulator', e); }
+  } else {
+    try { resetForm(); document.getElementById('namaUsaha').value = r.nama; } catch(e){}
+  }
+
+  // Belanja RT (3 sub-kategori) — utamakan slot DB, fallback ke riwayat[]
+  try { resetMakanan();    } catch(e){}
+  try { resetNonMakanan(); } catch(e){}
+  try { resetTahunan();    } catch(e){}
+  const rt = r.belanjaRT || {};
+  const findInRiwayat = (tipe) => {
+    const targets = riwayat.filter(x => x.tipe === tipe && x.nama && namaToKey(x.nama) === key);
+    return targets[0] || null;
+  };
+  const makanan    = rt.makanan    || findInRiwayat('makanan');
+  const nonmakanan = rt.nonmakanan || findInRiwayat('nonmakanan');
+  const tahunan    = rt.tahunan    || findInRiwayat('tahunanrt');
+  if (makanan)    { try { populateRT(makanan,    'makanan');    } catch(e){ console.warn('populateRT makanan', e); } }
+  if (nonmakanan) { try { populateRT(nonmakanan, 'nonmakanan'); } catch(e){ console.warn('populateRT nonmakanan', e); } }
+  if (tahunan)    { try { populateRT(tahunan,    'tahunan');    } catch(e){ console.warn('populateRT tahunan', e); } }
+
+  // Nilai Aset (Rincian 28) — utamakan slot DB, fallback ke riwayat[]
+  try { resetAset(); } catch(e){}
+  const aset = r.rincian28 || findInRiwayat('nilaiAset');
+  if (aset) { try { populateAset(aset); } catch(e){ console.warn('populateAset', e); } }
+
+  // Rincian 26 (Biaya Usaha) — kalau ada
+  const r26 = r.rincian26 || findInRiwayat('biayausaha');
+  if (r26) { try { populateBiayaUsaha(r26); } catch(e){} }
+
+  showTab('kalkulator');
+  showToast('✏️ Buka profil: ' + r.nama);
+}
+function hapusResponden(key) {
+  if (!respondenDB[key]) return;
+  const nama = respondenDB[key].nama;
+  if (!confirm(`Hapus profil responden "${nama}"? (Tidak bisa dibatalkan)`)) return;
+  delete respondenDB[key];
+  if (respondenAktif === key) respondenAktif = null;
+  persistRespondenDB();
+  renderRiwayat();
+  renderRespondenAktifBar();
+  showToast('🗑️ Profil "' + nama + '" dihapus');
+}
+
+function _renderRiwayatLegacy_unused() {
+  // (kode lama disimpan untuk referensi)
+
+  let html = '';
+  riwayat.forEach(r => {
+    const tipe = r.tipe || 'kalkulator';
+    const did = `detail-${r.id}`;
+
+    let judul = '', ringkas = '', detail = '';
+
+    if (tipe === 'biayausaha') {
+      judul = '📊 Biaya Usaha (Rincian 26)';
+      ringkas = `Total Pengeluaran: <b>${formatRp(r.total)}</b>`;
+      const rincianDetail = (label, items, nilai) => {
+        let out = `<div class="ri-detail-row"><span>${label}</span><span>${formatRp(nilai)}</span></div>`;
+        if (items && items.length) {
+          items.forEach(it => {
+            if (it.nilai > 0) out += `<div class="ri-detail-row" style="padding-left:12px;font-size:11px"><span>↳ ${it.nama}</span><span>${formatRp(it.nilai)}</span></div>`;
+          });
+        }
+        return out;
+      };
+      detail = rincianDetail('26.a Upah & Gaji', r.itemsA, r.a)
+             + rincianDetail('26.b Biaya Produksi', r.itemsB || r.itemsProduksi, r.b)
+             + rincianDetail('26.c Sewa & Jasa', r.itemsC, r.c)
+             + rincianDetail('26.d Biaya Operasional', r.itemsD, r.d)
+             + rincianDetail('26.e Non-Operasional', r.itemsE, r.e)
+             + `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue)"><span>Total</span><span>${formatRp(r.total)}</span></div>`;
+
+    } else if (tipe === 'nilaiAset') {
+      judul = '🏠 Nilai Aset Usaha (Rincian 28)';
+      ringkas = `Total Aset: <b>${formatRp(r.total)}</b>`;
+      const rincianAset = (label, items, nilai) => {
+        let out = `<div class="ri-detail-row"><span>${label}</span><span>${formatRp(nilai)}</span></div>`;
+        if (items && items.length) {
+          items.forEach(it => {
+            if (it.nilai > 0) out += `<div class="ri-detail-row" style="padding-left:12px;font-size:11px"><span>↳ ${it.nama}</span><span>${formatRp(it.nilai)}</span></div>`;
+          });
+        }
+        return out;
+      };
+      detail = rincianAset('28.a Tanah', r.itemsA, r.a)
+             + rincianAset('28.b Bangunan', r.itemsB, r.b)
+             + rincianAset('28.c Mesin & Peralatan', r.itemsC, r.c)
+             + rincianAset('28.d Kendaraan', r.itemsD, r.d)
+             + rincianAset('28.e Aset Lainnya', r.itemsE, r.e)
+             + `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue)"><span>Total</span><span>${formatRp(r.total)}</span></div>`;
+
+    } else if (tipe === 'makanan') {
+      judul = '🍽️ Belanja Makanan & Minuman';
+      ringkas = `Total/Minggu: <b>${formatRp(r.totalMinggu)}</b>`;
+      (r.items||[]).forEach(it => detail += `<div class="ri-detail-row"><span>↳ ${it.nama}</span><span>${formatRp(it.nilai)}/${it.satuan}</span></div>`);
+      detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue);margin-top:6px"><span>Total/Minggu</span><span>${formatRp(r.totalMinggu)}</span></div>`;
+      detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue)"><span>Total/Bulan</span><span>${formatRp(r.totalBulan)}</span></div>`;
+
+    } else if (tipe === 'nonmakanan') {
+      judul = '🏠 Belanja Non-Makanan (Bulanan)';
+      ringkas = `Total/Bulan: <b>${formatRp(r.totalBulan)}</b>`;
+      (r.items||[]).forEach(it => detail += `<div class="ri-detail-row"><span>↳ ${it.nama}</span><span>${formatRp(it.nilai)}/${it.satuan}</span></div>`);
+      detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue);margin-top:6px"><span>Total/Bulan</span><span>${formatRp(r.totalBulan)}</span></div>`;
+      detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue)"><span>Total/Tahun</span><span>${formatRp(r.totalTahun)}</span></div>`;
+
+    } else if (tipe === 'tahunanrt') {
+      judul = '📅 Pengeluaran Tahunan Non-Makanan';
+      ringkas = `Total/Tahun: <b>${formatRp(r.totalTahun)}</b>`;
+      (r.items||[]).forEach(it => detail += `<div class="ri-detail-row"><span>↳ ${it.nama}</span><span>${formatRp(it.nilai)}/tahun</span></div>`);
+      detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue);margin-top:6px"><span>Total/Tahun</span><span>${formatRp(r.totalTahun)}</span></div>`;
+
+    } else {
+      // kalkulator
+      const ikon = ikonJenis[r.jenis]||'📦';
+      const kk = r.nomorKeluarga && r.nomorKeluarga !== '-' ? `KK-${r.nomorKeluarga}` : '';
+      const bg = r.nomorBangunan && r.nomorBangunan !== '-' ? `BG-${r.nomorBangunan}` : '';
+      const noUrut = [kk, bg].filter(Boolean).join(' · ');
+      judul = `${ikon} ${r.nama}`;
+      ringkas = `${noUrut ? noUrut + ' · ' : ''}Laba/Bln: <b>${formatRp(r.labaBulan)}</b>`;
+      detail = `
+        <div class="ri-detail-row"><span>Jenis Usaha</span><span>${r.jenis}</span></div>
+        <div class="ri-detail-row"><span>Omzet/${r.satuan}</span><span>${formatRp(r.omzet)}</span></div>
+        <div class="ri-detail-row"><span>Omzet/Bulan</span><span>${formatRp(r.omzetBulan)}</span></div>
+        <div class="ri-detail-row"><span>Omzet/Tahun</span><span>${formatRp(r.omzetTahun)}</span></div>
+        <div class="ri-detail-row"><span>Total Biaya/Bln</span><span>${formatRp(r.totalBiayaBulan)}</span></div>`;
+      if (r.biayaItems && r.biayaItems.length) {
+        r.biayaItems.forEach(b => {
+          if (b.nilai > 0) detail += `<div class="ri-detail-row" style="padding-left:12px;font-size:11px"><span>↳ ${b.nama}</span><span>${formatRp(b.nilai)}/${r.satuan}</span></div>`;
+        });
+      }
+      detail += `
+        <div class="ri-detail-row" style="font-weight:700;color:var(--green)"><span>Laba/Bulan</span><span>${formatRp(r.labaBulan)}</span></div>
+        <div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue)"><span>Laba/Tahun</span><span>${formatRp(r.labaTahun)}</span></div>`;
+    }
+
+    html += `
+    <div class="riwayat-item" id="ri-${r.id}">
+      <div class="ri-header" onclick="toggleDetail('${did}')" style="cursor:pointer">
+        <div>
+          <div class="ri-nama">${judul}</div>
+          <div class="ri-waktu">${r.waktu}</div>
+          <div class="ri-jenis" style="margin-top:4px">${ringkas}</div>
+        </div>
+        <span id="arr-${did}" style="color:var(--muted);font-size:18px;transition:transform 0.2s">▼</span>
+      </div>
+      <div id="${did}" class="ri-detail-body" style="display:none">
+        ${detail}
+      </div>
+      <div class="ri-footer" style="margin-top:10px">
+        <button class="ri-btn edit" onclick='editRiwayat(${r.id})'>✏️ Edit</button>
+        <button class="ri-btn copy" onclick='salinRiwayat(${r.id})'>📋 Salin</button>
+        <button class="ri-btn del" onclick='hapusRiwayat(${r.id})'>🗑️ Hapus</button>
+      </div>
+    </div>`;
+  });
+
+  html += `<button class="clear-all-btn" onclick="hapusSemua()">🗑️ Hapus Semua Riwayat</button>`;
+  container.innerHTML = html;
+}
+
+function toggleDetail(did) {
+  const el = document.getElementById(did);
+  const arr = document.getElementById('arr-' + did);
+  if (!el) return;
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  if (arr) arr.style.transform = open ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+function salinRiwayat(id) {
+  const r = riwayat.find(x => x.id === id);
+  if (!r) return;
+  const tipe = r.tipe || 'kalkulator';
+  let teks = '';
+
+  if (tipe === 'biayausaha') {
+    teks = `=== RINCIAN 26. PENGELUARAN USAHA ===
+26.a Upah, Gaji & Jaminan Sosial : ${formatRp(r.a)}
+26.b Biaya Produksi              : ${formatRp(r.b)}
+26.c Biaya Sewa & Jasa Lainnya    : ${formatRp(r.c)}
+26.d Biaya Operasional            : ${formatRp(r.d)}
+26.e Biaya Non-Operasional        : ${formatRp(r.e)}
+------------------------------------
+26.f TOTAL PENGELUARAN             : ${formatRp(r.total)}
+======================================`;
+  } else if (tipe === 'nilaiAset') {
+    teks = `=== RINCIAN 28. NILAI ASET USAHA ===
+28.a Tanah                  : ${formatRp(r.a)}
+28.b Bangunan               : ${formatRp(r.b)}
+28.c Mesin & Peralatan      : ${formatRp(r.c)}
+28.d Kendaraan Usaha        : ${formatRp(r.d)}
+28.e Aset Lainnya           : ${formatRp(r.e)}
+------------------------------------
+28.f TOTAL NILAI ASET        : ${formatRp(r.total)}
+====================================`;
+  } else if (tipe === 'makanan') {
+    teks = `=== PENGELUARAN MAKANAN & MINUMAN ===\n\n`;
+    (r.items||[]).forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /${it.satuan}\n`);
+    teks += `\n------------------------------------\n`;
+    teks += `TOTAL / MINGGU : ${formatRp(r.totalMinggu)}\n`;
+    teks += `TOTAL / BULAN  : ${formatRp(r.totalBulan)}\n`;
+    teks += `====================================`;
+  } else if (tipe === 'nonmakanan') {
+    teks = `=== PENGELUARAN NON-MAKANAN (BULANAN) ===\n\n`;
+    (r.items||[]).forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /${it.satuan}\n`);
+    teks += `\n------------------------------------\n`;
+    teks += `TOTAL / BULAN : ${formatRp(r.totalBulan)}\n`;
+    teks += `TOTAL / TAHUN : ${formatRp(r.totalTahun)}\n`;
+    teks += `====================================`;
+  } else if (tipe === 'tahunanrt') {
+    teks = `=== PENGELUARAN TAHUNAN NON-MAKANAN ===\n\n`;
+    (r.items||[]).forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /tahun\n`);
+    teks += `\n------------------------------------\n`;
+    teks += `TOTAL / TAHUN : ${formatRp(r.totalTahun)}\n`;
+    teks += `====================================`;
+  } else {
+    const kk = r.nomorKeluarga && r.nomorKeluarga !== '-' ? `No. KK: ${r.nomorKeluarga}\n` : '';
+    const bg = r.nomorBangunan && r.nomorBangunan !== '-' ? `No. Bangunan: ${r.nomorBangunan}\n` : '';
+    teks = `=== SE2026 ===\n${kk}${bg}${r.nama} (${r.jenis})\nOmzet/Bln: ${formatRp(r.omzetBulan)}\nBiaya/Bln: ${formatRp(r.totalBiayaBulan)}\nLaba/Bln: ${formatRp(r.labaBulan)}\nLaba/Thn: ${formatRp(r.labaTahun)}`;
+  }
+
+  copyToClipboard(teks);
+}
+
+function hapusRiwayat(id) {
+  // Kalau yang dihapus sedang diedit, batalkan dulu mode edit
+  if (window._editingId === id) finishEdit();
+  riwayat = riwayat.filter(x => x.id !== id);
+  localStorage.setItem('se2026_riwayat', JSON.stringify(riwayat));
+  renderRiwayat();
+}
+
+// ===== EDIT RIWAYAT =====
+// Muat data dari riwayat kembali ke tab asal, agar bisa diubah dan disimpan ulang.
+window._editingId = null;
+
+function editRiwayat(id) {
+  const r = riwayat.find(x => x.id === id);
+  if (!r) { showToast('⚠️ Data tidak ditemukan'); return; }
+
+  window._editingId = id;
+  const tipe = r.tipe || 'kalkulator';
+
+  // === Pre-populate SEMUA tab dari profil responden ===
+  // Supaya saat user pindah tab, data Belanja RT / Aset / dll ikut tampil.
+  const key = namaToKey(r.nama);
+  const profil = key ? respondenDB[key] : null;
+  if (profil) {
+    respondenAktif = key;
+    renderRespondenAktifBar();
+
+    // Kalkulator
+    if (profil.kalkulator) {
+      try { populateKalkulator(profil.kalkulator); } catch(e){ console.warn('populateKalkulator', e); }
+    } else {
+      try { resetForm(); } catch(e){}
+    }
+
+    // Belanja RT (3 sub-kategori) — utamakan profil DB, fallback ke riwayat[] (data lama)
+    try { resetMakanan();    } catch(e){}
+    try { resetNonMakanan(); } catch(e){}
+    try { resetTahunan();    } catch(e){}
+    const rt = (profil && profil.belanjaRT) ? profil.belanjaRT : {};
+    // Fallback: cari entri di riwayat[] berdasarkan nama (untuk data legacy tanpa belanjaRT slot)
+    const findInRiwayat = (tipe) => {
+      if (!key) return null;
+      // Hanya match entri yang nama-nya cocok dengan responden yang sedang diedit
+      const targets = riwayat.filter(x => x.tipe === tipe && x.nama && namaToKey(x.nama) === key);
+      return targets[0] || null;
+    };
+    const makanan    = rt.makanan    || findInRiwayat('makanan');
+    const nonmakanan = rt.nonmakanan || findInRiwayat('nonmakanan');
+    const tahunan    = rt.tahunan    || findInRiwayat('tahunanrt');
+    if (makanan)    { try { populateRT(makanan,    'makanan');    } catch(e){ console.warn('populateRT makanan', e); } }
+    if (nonmakanan) { try { populateRT(nonmakanan, 'nonmakanan'); } catch(e){ console.warn('populateRT nonmakanan', e); } }
+    if (tahunan)    { try { populateRT(tahunan,    'tahunan');    } catch(e){ console.warn('populateRT tahunan', e); } }
+
+    // Nilai Aset (Rincian 28) — fallback ke riwayat[] juga
+    try { resetAset(); } catch(e){}
+    const aset = (profil && profil.rincian28) || findInRiwayat('nilaiAset');
+    if (aset) { try { populateAset(aset); } catch(e){ console.warn('populateAset', e); } }
+
+    // Rincian 26 (Biaya Usaha) — kompat tab lama
+    const r26 = (profil && profil.rincian26) || findInRiwayat('biayausaha');
+    if (r26) { try { populateBiayaUsaha(r26); } catch(e){} }
+  }
+
+  // Pastikan window._editingId tidak ter-reset oleh resetForm di atas
+  window._editingId = id;
+
+  // Pindah ke tab yang sesuai dengan entry yang user klik
+  if      (tipe === 'kalkulator')  { showTab('kalkulator'); }
+  else if (tipe === 'biayausaha')  { showTab('biayausaha'); }
+  else if (tipe === 'nilaiAset')   { showTab('nilaiAset');  }
+  else if (tipe === 'makanan')     { showTab('belanjart');  }
+  else if (tipe === 'nonmakanan')  { showTab('belanjart');  }
+  else if (tipe === 'tahunanrt')   { showTab('belanjart');  }
+  else { showToast('⚠️ Tipe tidak dikenal'); window._editingId = null; return; }
+
+  showEditBanner(tipe, r);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showEditBanner(tipe, r) {
+  const labels = {
+    kalkulator: 'Kalkulator Usaha',
+    biayausaha: 'Rincian 26 — Biaya Usaha',
+    nilaiAset:  'Rincian 28 — Nilai Aset',
+    makanan:    'Belanja RT — Makanan & Minuman',
+    nonmakanan: 'Belanja RT — Non-Makanan',
+    tahunanrt:  'Belanja RT — Tahunan'
+  };
+  const banner = document.getElementById('editBanner');
+  document.getElementById('editBannerInfo').textContent =
+    `${labels[tipe] || tipe} • ${r.nama || ''} • ${r.waktu || ''}`;
+  banner.classList.add('show');
+}
+
+function hideEditBanner() {
+  const banner = document.getElementById('editBanner');
+  if (banner) banner.classList.remove('show');
+}
+
+function batalEdit() {
+  finishEdit();
+  showTab('riwayat');
+  showToast('Edit dibatalkan');
+}
+
+// ===== POPULATE: KALKULATOR =====
+function populateKalkulator(r) {
+  // Reset dulu agar tidak menumpuk
+  resetForm();
+  window._editingId = r.id; // resetForm tidak menyentuh _editingId tapi pastikan
+  if (r.nama && r.nama !== 'Tanpa Nama') document.getElementById('namaUsaha').value = r.nama;
+  document.getElementById('nomorKeluarga').value = (r.nomorKeluarga && r.nomorKeluarga !== '-') ? r.nomorKeluarga : '';
+  document.getElementById('nomorBangunan').value = (r.nomorBangunan && r.nomorBangunan !== '-') ? r.nomorBangunan : '';
+  const pek = document.getElementById('pekerjaanResponden');
+  if (pek && r.pekerjaan) pek.value = r.pekerjaan;
+
+  // Pilih jenis usaha (set dropdown value)
+  if (r.jenis) {
+    const sel = document.getElementById('jenisUsahaSelect');
+    if (sel) {
+      sel.value = r.jenis;
+      pilihJenis(null, r.jenis);
+    }
+  }
+
+  // Satuan waktu + omzet (raw input value)
+  document.getElementById('satuanWaktu').value = r.satuan || 'hari';
+  updateSatuan();
+  if (r.omzet != null) document.getElementById('omzet').value = formatNumberId(r.omzet);
+
+  // Karyawan
+  if (r.nKaryawan != null) document.getElementById('jumlahKaryawan').value = r.nKaryawan;
+  if (r.gajiPerOrang) document.getElementById('gajiPerOrang').value = formatNumberId(r.gajiPerOrang);
+  const js = document.getElementById('jamsosPerOrang');
+  if (js && r.jamsosPerOrang) js.value = formatNumberId(r.jamsosPerOrang);
+  const th = document.getElementById('thrPerOrang');
+  if (th && r.thrPerOrang) th.value = formatNumberId(r.thrPerOrang);
+
+  // Biaya items (legacy single list)
+  document.getElementById('biayaList').innerHTML = '';
+  biayaCounter = 0;
+  if (Array.isArray(r.biayaItems)) {
+    r.biayaItems.forEach(it => tambahBiaya(it.nama || '', it.nilai ? formatNumberId(it.nilai) : ''));
+  }
+
+  // Restore Rincian 26.b-e (sub-items per kategori) jika tersimpan
+  const itemsByKat = {
+    b: r.items26B || [],
+    c: r.items26C || [],
+    d: r.items26D || [],
+    e: r.items26E || []
+  };
+  ['b','c','d','e'].forEach(k => {
+    const list = document.getElementById('bu26' + k + 'List');
+    if (list) list.innerHTML = '';
+    (itemsByKat[k] || []).forEach(it => {
+      tambahItemBiaya(k);
+      const rows = document.querySelectorAll('#bu26' + k + 'List .rt-row');
+      const last = rows[rows.length - 1];
+      const inputs = last.querySelectorAll('input');
+      inputs[0].value = it.nama || '';
+      inputs[1].value = it.nilai ? formatNumberId(it.nilai) : '';
+    });
+  });
+  hitungBiayaUsaha();
+
+  // Hitung ulang & tampilkan hasil
+  hitung();
+}
+
+// ===== POPULATE: BIAYA USAHA (Rincian 26) =====
+function populateBiayaUsaha(r) {
+  ['a','b','c','d','e'].forEach(k => {
+    document.getElementById('bu26' + k + 'List').innerHTML = '';
+    const items = r['items' + k.toUpperCase()] || [];
+    items.forEach(it => {
+      tambahItemBiaya(k);
+      const rows = document.querySelectorAll('#bu26' + k + 'List .rt-row');
+      const last = rows[rows.length - 1];
+      const inputs = last.querySelectorAll('input');
+      inputs[0].value = it.nama || '';
+      inputs[1].value = it.nilai ? formatNumberId(it.nilai) : '';
+    });
+  });
+  hitungBiayaUsaha();
+}
+
+// ===== POPULATE: NILAI ASET (Rincian 28) =====
+function populateAset(r) {
+  ['a','b','c','d','e'].forEach(k => {
+    document.getElementById('aset28' + k + 'List').innerHTML = '';
+    const items = r['items' + k.toUpperCase()] || [];
+    items.forEach(it => {
+      tambahItemAset(k);
+      const rows = document.querySelectorAll('#aset28' + k + 'List .rt-row');
+      const last = rows[rows.length - 1];
+      const inputs = last.querySelectorAll('input');
+      inputs[0].value = it.nama || '';
+      inputs[1].value = it.nilai ? formatNumberId(it.nilai) : '';
+    });
+  });
+  hitungAset();
+}
+
+// ===== POPULATE: BELANJA RT (makanan / nonmakanan / tahunan) =====
+function populateRT(r, kategori) {
+  const items = r.items || [];
+  if (kategori === 'tahunan') {
+    document.getElementById('rtTahunanList').innerHTML = '';
+    items.forEach(it => {
+      tambahItemRTTahunan();
+      const rows = document.querySelectorAll('#rtTahunanList .rt-row');
+      const last = rows[rows.length - 1];
+      const inputs = last.querySelectorAll('input');
+      inputs[0].value = it.nama || '';
+      inputs[1].value = it.nilai ? formatNumberId(it.nilai) : '';
+    });
+    hitungTahunan();
+  } else {
+    const listId = kategori === 'makanan' ? 'rtMakananList' : 'rtNonMakananList';
+    document.getElementById(listId).innerHTML = '';
+    items.forEach(it => {
+      tambahItemRT(listId, kategori);
+      const rows = document.querySelectorAll('#' + listId + ' .rt-row');
+      const last = rows[rows.length - 1];
+      const inputs = last.querySelectorAll('input');
+      inputs[0].value = it.nama || '';
+      inputs[1].value = it.nilai ? formatNumberId(it.nilai) : '';
+      const sel = last.querySelector('select');
+      if (sel && it.satuan) sel.value = it.satuan;
+    });
+    if (kategori === 'makanan') hitungMakanan();
+    else hitungNonMakanan();
+  }
+  // Auto-scroll ke section yang dipilih
+  const anchor = kategori === 'makanan' ? 'rtMakananList'
+              : kategori === 'nonmakanan' ? 'rtNonMakananList'
+              : 'rtTahunanList';
+  const el = document.getElementById(anchor);
+  if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+}
+
+// Helper format angka ID (1234567 → "1.234.567")
+function formatNumberId(n) {
+  if (n == null || isNaN(n)) return '';
+  return Number(n).toLocaleString('id-ID');
+}
+
+function hapusSemua() {
+  if (!confirm('Hapus semua riwayat?')) return;
+  riwayat = [];
+  localStorage.setItem('se2026_riwayat', JSON.stringify(riwayat));
+  renderRiwayat();
+}
+
+// ===== EXPORT RIWAYAT — wide format (1 baris per responden) =====
+function exportRiwayat(format) {
+  const respKeys = Object.keys(respondenDB);
+  if (!respKeys.length) { showToast('⚠️ Belum ada responden untuk diekspor'); return; }
+  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  let blob, filename;
+
+  // Flatten satu responden ke object kolom-kolom
+  const flatten = (r) => {
+    const k = r.kalkulator || {};
+    const r26 = r.rincian26 || {};
+    const r28 = r.rincian28 || {};
+    const rt  = r.belanjaRT || {};
+    const mak = rt.makanan || {};
+    const non = rt.nonmakanan || {};
+    const tah = rt.tahunan  || {};
+    return {
+      nama:        r.nama || '',
+      pekerjaan:   r.pekerjaan || k.pekerjaan || '',
+      jenis:       r.jenis || k.jenis || '',
+      kbli:        r.kbli  || k.kbli  || '',
+      nomorKK:     k.nomorKeluarga || '',
+      nomorBangunan: k.nomorBangunan || '',
+      satuan:      k.satuan || '',
+      omzet_input: k.omzet || '',
+      omzetBulan:  k.omzetBulan || '',
+      omzetTahun:  k.omzetTahun || '',
+      totalBiayaBulan: k.totalBiayaBulan || '',
+      labaBulan:   k.labaBulan || '',
+      labaTahun:   k.labaTahun || '',
+      rugi:        k.rugi ? 'YA' : '',
+      nKaryawan:   k.nKaryawan || '',
+      gajiPerOrang:k.gajiPerOrang || '',
+      jamsosPerOrang: k.jamsosPerOrang || '',
+      thrPerOrang: k.thrPerOrang || '',
+      r26a_upahGaji:        r26.a || '',
+      r26b_produksi:        r26.b || '',
+      r26c_sewaJasa:        r26.c || '',
+      r26d_operasional:     r26.d || '',
+      r26e_nonOperasional:  r26.e || '',
+      r26f_TOTAL:           r26.total || '',
+      r28a_tanah:           r28.a || '',
+      r28b_bangunan:        r28.b || '',
+      r28c_mesinPeralatan:  r28.c || '',
+      r28d_kendaraan:       r28.d || '',
+      r28e_lainnya:         r28.e || '',
+      r28_TOTAL:            r28.total || '',
+      rt_makanan_minggu:    mak.totalMinggu || '',
+      rt_makanan_bulan:     mak.totalBulan  || '',
+      rt_nonmakanan_bulan:  non.totalBulan  || '',
+      rt_nonmakanan_tahun:  non.totalTahun  || '',
+      rt_tahunan_tahun:     tah.totalTahun  || '',
+      waktuPertama: r.waktuPertama || '',
+      waktuUpdate:  r.waktuUpdate || ''
+    };
+  };
+
+  if (format === 'json') {
+    const data = respKeys.map(k => respondenDB[k]);
+    blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    filename = `responden-se2026-${stamp}.json`;
+  } else {
+    // CSV wide format
+    const rows = respKeys.map(k => flatten(respondenDB[k]));
+    if (!rows.length) { showToast('⚠️ Tidak ada data'); return; }
+    const headers = Object.keys(rows[0]);
+    const csvLines = [headers.join(',')];
+    rows.forEach(r => {
+      csvLines.push(headers.map(h => {
+        const v = r[h];
+        if (v == null || v === '') return '';
+        // Quote kalau ada koma/quote/newline
+        const s = String(v);
+        if (/[,"\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+        return s;
+      }).join(','));
+    });
+    blob = new Blob(['\uFEFF' + csvLines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    filename = `responden-se2026-${stamp}.csv`;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ File berhasil diunduh!');
+}
+
+// ===== RESET =====
+function resetForm() {
+  document.getElementById('namaUsaha').value = '';
+  const pek = document.getElementById('pekerjaanResponden');
+  if (pek) pek.selectedIndex = 0;
+  document.getElementById('omzet').value = '';
+  document.getElementById('jumlahKaryawan').value = '0';
+  document.getElementById('gajiPerOrang').value = '';
+  const js = document.getElementById('jamsosPerOrang');
+  if (js) js.value = '';
+  const th = document.getElementById('thrPerOrang');
+  if (th) th.value = '';
+  document.getElementById('biayaList').innerHTML = '';
+  // Hapus juga semua sub-items 26.a-e (yang baru dipindah ke Kalkulator)
+  ['a','b','c','d','e'].forEach(k => {
+    const el = document.getElementById('bu26' + k + 'List');
+    if (el) el.innerHTML = '';
+    const sub = document.getElementById('bu26' + k + '-subtotal');
+    if (sub) sub.textContent = 'Rp 0';
+  });
+  const f = document.getElementById('bu26f'); if (f) f.textContent = 'Rp 0';
+  document.getElementById('hasilSection').style.display = 'none';
+  const rugiEl = document.getElementById('rugiWarning');
+  if (rugiEl) rugiEl.style.display = 'none';
+  const kbliEl = document.getElementById('kbliTag');
+  if (kbliEl) kbliEl.style.display = 'none';
+  // Reset dropdown jenis usaha
+  const sel = document.getElementById('jenisUsahaSelect');
+  if (sel) sel.value = '';
+  jenisUsaha = '';
+  document.getElementById('musimSection').style.display = 'none';
+  biayaCounter = 0;
+  window._lastHasil = null;
+  window._lastBiayaUsaha = null;
+  updateTkSummary();
+  syncBiayaUsahaSummary();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== KONVERTER =====
+function toggleKonvHari(el) {
+  el.classList.toggle('active');
+  const n = document.querySelectorAll('#konvHariGrid .hari-btn.active').length;
+  document.getElementById('konvHariHint').textContent = `${n} hari/minggu`;
+  konversi();
+}
+
+function konversi() {
+  const val = parseRp(document.getElementById('konvInput').value);
+  const dari = document.getElementById('konvDari').value;
+  const nHari = document.querySelectorAll('#konvHariGrid .hari-btn.active').length || 5;
+  const hariPerBulan = Math.round(nHari * 52 / 12);
+
+  if (!val) { document.getElementById('konvResult').style.display = 'none'; return; }
+
+  let perHari, perMinggu, perBulan, perTahun;
+  if (dari === 'hari') { perHari = val; perMinggu = val * nHari; perBulan = val * hariPerBulan; perTahun = perBulan * 12; }
+  else if (dari === 'minggu') { perMinggu = val; perHari = val / nHari; perBulan = val * (52/12); perTahun = perBulan * 12; }
+  else if (dari === 'bulan') { perBulan = val; perHari = val / hariPerBulan; perMinggu = val / (52/12); perTahun = val * 12; }
+  else { perTahun = val; perBulan = val / 12; perHari = perBulan / hariPerBulan; perMinggu = perBulan / (52/12); }
+
+  const results = [
+    { label: 'Per Hari', val: perHari, key: 'hari' },
+    { label: 'Per Minggu', val: perMinggu, key: 'minggu' },
+    { label: 'Per Bulan', val: perBulan, key: 'bulan' },
+    { label: 'Per Tahun', val: perTahun, key: 'tahun' },
+  ];
+
+  let html = '';
+  results.forEach(r => {
+    const isActive = r.key === dari;
+    html += `<div class="konv-row ${isActive ? 'konv-active' : ''}">
+      <span class="konv-label">${r.label}${isActive ? ' ★' : ''}</span>
+      <span class="konv-nilai">${formatRp(r.val)}</span>
+    </div>`;
+  });
+  html += `<p style="font-size:10px;color:var(--muted);margin-top:10px;font-style:italic">${terbilang(perTahun)} per tahun</p>`;
+  document.getElementById('konvRows').innerHTML = html;
+  document.getElementById('konvResult').style.display = 'block';
+}
+
+// ===== MARGIN =====
+function hitungMargin() {
+  const jual = parseRp(document.getElementById('hargaJual').value);
+  const modal = parseRp(document.getElementById('hargaModal').value);
+  if (!jual || !modal) { document.getElementById('marginResult').style.display = 'none'; return; }
+
+  const laba = jual - modal;
+  const marginPct = ((laba / jual) * 100).toFixed(1);
+  const markupPct = ((laba / modal) * 100).toFixed(1);
+
+  document.getElementById('marginRows').innerHTML = `
+    <div class="konv-row"><span class="konv-label">Laba Kotor</span><span class="konv-nilai" style="color:${laba >= 0 ? 'var(--green)' : 'var(--red)'}">${formatRp(laba)}</span></div>
+    <div class="konv-row"><span class="konv-label">Margin Laba (%)</span><span class="konv-nilai">${marginPct}%</span></div>
+    <div class="konv-row konv-active"><span class="konv-label">Markup (%)</span><span class="konv-nilai">${markupPct}%</span></div>
+  `;
+  document.getElementById('marginResult').style.display = 'block';
+}
+
+// ===== BIAYA USAHA (Rincian 26 FASIH) =====
+let produksiCounter = 0;
+
+const PLACEHOLDER_BIAYA = {
+  a: 'Contoh: Gaji pokok, Lembur, THR',
+  b: 'Contoh: Bahan baku, Kemasan',
+  c: 'Contoh: Sewa tempat, Sewa alat',
+  d: 'Contoh: Listrik, Internet, Pulsa',
+  e: 'Contoh: Bunga pinjaman, Pajak usaha'
+};
+
+function tambahItemBiaya(kategori) {
+  produksiCounter++;
+  const id = produksiCounter;
+  const div = document.createElement('div');
+  div.className = 'rt-row';
+  div.id = 'biaya' + kategori + '-' + id;
+  div.innerHTML = `
+    <div class="rt-row-line1">
+      <div class="input-wrap biaya-nama">
+        <input type="text" placeholder="${PLACEHOLDER_BIAYA[kategori]}" oninput="hitungBiayaUsaha()">
+      </div>
+      <button class="del-btn" onclick="hapusItemBiaya('${kategori}', ${id})">×</button>
+    </div>
+    <div class="rt-row-line2">
+      <div class="input-wrap" style="flex:1">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" placeholder="0" oninput="hitungBiayaUsaha()">
+      </div>
+    </div>
+  `;
+  document.getElementById('bu26' + kategori + 'List').appendChild(div);
+  hitungBiayaUsaha();
+}
+
+function hapusItemBiaya(kategori, id) {
+  const el = document.getElementById('biaya' + kategori + '-' + id);
+  if (el) el.remove();
+  hitungBiayaUsaha();
+}
+
+function getItemsBiaya(kategori) {
+  const rows = document.querySelectorAll('#bu26' + kategori + 'List .rt-row');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    const nama = inputs[0].value || 'Item';
+    const nilai = parseRp(inputs[1].value);
+    return { nama, nilai };
+  });
+}
+
+// Alias agar kompatibel dengan kode lama (26.b biaya produksi)
+function tambahItemProduksi() { tambahItemBiaya('b'); }
+function hapusItemProduksi(id) { hapusItemBiaya('b', id); }
+function getItemsProduksi() { return getItemsBiaya('b'); }
+
+function hitungBiayaUsaha() {
+  // 26.a OTOMATIS dari Tenaga Kerja (Choice 1A): (gaji + jamsos) × 12 × jumlah + THR × jumlah
+  const n      = parseFloat((document.getElementById('jumlahKaryawan') || {}).value || '0') || 0;
+  const gaji   = parseRp((document.getElementById('gajiPerOrang')   || {}).value || '');
+  const jamsos = parseRp((document.getElementById('jamsosPerOrang') || {}).value || '');
+  const thr    = parseRp((document.getElementById('thrPerOrang')    || {}).value || '');
+  const a = n * ((gaji + jamsos) * 12 + thr);
+  // 26.b-e dari sub-items — input diasumsi PER BULAN, subtotal × 12 = per TAHUN
+  const itemsA = [];  // tidak dipakai (Choice 1A)
+  const itemsB = getItemsBiaya('b');
+  const itemsC = getItemsBiaya('c');
+  const itemsD = getItemsBiaya('d');
+  const itemsE = getItemsBiaya('e');
+  const b_bulan = itemsB.reduce((s, it) => s + it.nilai, 0);
+  const c_bulan = itemsC.reduce((s, it) => s + it.nilai, 0);
+  const d_bulan = itemsD.reduce((s, it) => s + it.nilai, 0);
+  const e_bulan = itemsE.reduce((s, it) => s + it.nilai, 0);
+  const b = b_bulan * 12;
+  const c = c_bulan * 12;
+  const d = d_bulan * 12;
+  const e = e_bulan * 12;
+  const total = a + b + c + d + e;
+
+  // Helper: tampilkan subtotal/tahun + breakdown /bulan
+  const renderSub = (id, perTahun, perBulan) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (perBulan > 0) {
+      el.innerHTML = formatRp(perTahun) + ` <span style="font-size:11px;font-weight:500;color:var(--muted)">(= ${formatRp(perBulan)} / bulan × 12)</span>`;
+    } else {
+      el.textContent = formatRp(perTahun);
+    }
+  };
+  document.getElementById('bu26a-subtotal').textContent = formatRp(a);
+  renderSub('bu26b-subtotal', b, b_bulan);
+  renderSub('bu26c-subtotal', c, c_bulan);
+  renderSub('bu26d-subtotal', d, d_bulan);
+  renderSub('bu26e-subtotal', e, e_bulan);
+  const f = document.getElementById('bu26f'); if (f) f.textContent = formatRp(total);
+  const ft = document.getElementById('bu26f-terbilang'); if (ft) ft.textContent = total > 0 ? terbilang(total) : '';
+
+  // Auto-sync ke tab Biaya Usaha (summary)
+  syncBiayaUsahaSummary();
+
+  window._lastBiayaUsaha = {
+    a, b, c, d, e, total,
+    b_bulan, c_bulan, d_bulan, e_bulan,  // raw per-bulan input (untuk edit/restore)
+    itemsA, itemsB, itemsC, itemsD, itemsE,
+    itemsProduksi: itemsB,
+    nKaryawan: n, gajiPerOrang: gaji, jamsosPerOrang: jamsos, thrPerOrang: thr
+  };
+}
+
+function salinBiayaUsaha() {
+  const h = window._lastBiayaUsaha;
+  if (!h || !h.total) { showToast('⚠️ Isi dulu rinciannya'); return; }
+
+  const rincian = (items) => items.filter(it => it.nilai > 0).map(it => `    ↳ ${it.nama}: ${formatRp(it.nilai)}\n`).join('');
+
+  const teks = `=== RINCIAN 26. PENGELUARAN USAHA ===
+26.a Upah, Gaji & Jaminan Sosial : ${formatRp(h.a)}
+${rincian(h.itemsA)}26.b Biaya Produksi              : ${formatRp(h.b)}
+${rincian(h.itemsB)}26.c Biaya Sewa & Jasa Lainnya    : ${formatRp(h.c)}
+${rincian(h.itemsC)}26.d Biaya Operasional            : ${formatRp(h.d)}
+${rincian(h.itemsD)}26.e Biaya Non-Operasional        : ${formatRp(h.e)}
+${rincian(h.itemsE)}------------------------------------
+26.f TOTAL PENGELUARAN             : ${formatRp(h.total)}
+(${terbilang(h.total)})
+======================================`;
+  copyToClipboard(teks);
+}
+
+function resetBiayaUsaha() {
+  ['a','b','c','d','e'].forEach(k => {
+    document.getElementById('bu26' + k + 'List').innerHTML = '';
+    document.getElementById('bu26' + k + '-subtotal').textContent = 'Rp 0';
+  });
+  document.getElementById('bu26f').textContent = 'Rp 0';
+  document.getElementById('bu26f-terbilang').textContent = '';
+  window._lastBiayaUsaha = null;
+}
+
+// ===== BELANJA RT (Pengeluaran Rumah Tangga, rinci per item) =====
+let rtCounter = 0;
+
+function tambahItemRT(containerId, kategori) {
+  rtCounter++;
+  const id = rtCounter;
+  const div = document.createElement('div');
+  div.className = 'rt-row';
+  div.id = 'rt-' + id;
+  div.dataset.kategori = kategori;
+  const fnHitung = kategori === 'makanan' ? 'hitungMakanan' : 'hitungNonMakanan';
+  div.innerHTML = `
+    <div class="rt-row-line1">
+      <div class="input-wrap biaya-nama">
+        <input type="text" placeholder="Nama item" oninput="${fnHitung}()">
+      </div>
+      <button class="del-btn" onclick="hapusItemRT(${id}, '${fnHitung}')">×</button>
+    </div>
+    <div class="rt-row-line2">
+      <div class="input-wrap" style="flex:1.4">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" placeholder="0" oninput="${fnHitung}()">
+      </div>
+      <div class="input-wrap" style="flex:1">
+        <select onchange="${fnHitung}()">
+          <option value="hari">/hari</option>
+          <option value="minggu">/minggu</option>
+          <option value="bulan" selected>/bulan</option>
+          <option value="tahun">/tahun</option>
+        </select>
+      </div>
+    </div>
+  `;
+  document.getElementById(containerId).appendChild(div);
+}
+
+function tambahItemRTTahunan() {
+  rtCounter++;
+  const id = rtCounter;
+  const div = document.createElement('div');
+  div.className = 'rt-row';
+  div.id = 'rt-' + id;
+  div.dataset.kategori = 'tahunan';
+  div.innerHTML = `
+    <div class="rt-row-line1">
+      <div class="input-wrap biaya-nama">
+        <input type="text" placeholder="Contoh: Perbaikan rumah, Pajak motor" oninput="hitungTahunan()">
+      </div>
+      <button class="del-btn" onclick="hapusItemRT(${id}, 'hitungTahunan')">×</button>
+    </div>
+    <div class="rt-row-line2">
+      <div class="input-wrap" style="flex:1">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" placeholder="0" oninput="hitungTahunan()">
+      </div>
+      <span class="hint" style="display:flex;align-items:center;padding-left:8px;flex:0.6">/tahun</span>
+    </div>
+  `;
+  document.getElementById('rtTahunanList').appendChild(div);
+}
+
+function hapusItemRT(id, fnHitung) {
+  const el = document.getElementById('rt-' + id);
+  if (el) el.remove();
+  if (fnHitung === 'hitungMakanan') hitungMakanan();
+  else if (fnHitung === 'hitungTahunan') hitungTahunan();
+  else hitungNonMakanan();
+}
+
+function bacaItemRows(rows, satuanTetap) {
+  const hariPerBulan = 30;
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    const select = row.querySelector('select');
+    const nama = inputs[0].value || 'Item';
+    const nilai = parseRp(inputs[1].value);
+    const satuan = satuanTetap || (select ? select.value : 'bulan');
+
+    let bulanan = 0;
+    if (satuan === 'hari') bulanan = nilai * hariPerBulan;
+    else if (satuan === 'minggu') bulanan = nilai * (52/12);
+    else if (satuan === 'bulan') bulanan = nilai;
+    else if (satuan === 'tahun') bulanan = nilai / 12;
+
+    return { nama, nilai, satuan, bulanan };
+  });
+}
+
+// ===== BAGIAN 1: MAKANAN & MINUMAN (hasil mingguan) =====
+function hitungMakanan() {
+  const rows = document.querySelectorAll('#rtMakananList .rt-row');
+  const items = bacaItemRows(rows);
+  const totalBulan = items.reduce((s, it) => s + it.bulanan, 0);
+  const totalMinggu = totalBulan * 12 / 52;
+
+  let html = '';
+  items.forEach(it => {
+    html += `<div class="ringkasan-row"><span class="rk-label">${it.nama}</span><span class="rk-val">${formatRp(it.nilai)}/${it.satuan}</span></div>`;
+  });
+  document.getElementById('ringkasanMakanan').innerHTML = html || '<p class="hint">Belum ada item ditambahkan</p>';
+  document.getElementById('rt-total-minggu').textContent = formatRp(totalMinggu);
+
+  window._lastMakanan = { items, totalBulan, totalMinggu, waktu: new Date().toLocaleString('id-ID') };
+}
+
+function salinMakanan() {
+  const h = window._lastMakanan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  let teks = `=== PENGELUARAN MAKANAN & MINUMAN ===\n\n`;
+  h.items.forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /${it.satuan}\n`);
+  teks += `\n------------------------------------\n`;
+  teks += `TOTAL / MINGGU : ${formatRp(h.totalMinggu)}\n`;
+  teks += `TOTAL / BULAN  : ${formatRp(h.totalBulan)}\n`;
+  teks += `====================================`;
+  copyToClipboard(teks);
+}
+
+function simpanRiwayatMakanan() {
+  hitungMakanan();
+  const h = window._lastMakanan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  const nama = getCurrentNama();
+  if (!nama) { showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu'); return; }
+  pushOrReplaceRiwayat({ tipe: 'makanan', nama, ...h });
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+function resetMakanan() {
+  document.getElementById('rtMakananList').innerHTML = '';
+  document.getElementById('ringkasanMakanan').innerHTML = '';
+  document.getElementById('rt-total-minggu').textContent = 'Rp 0';
+  window._lastMakanan = null;
+}
+
+// ===== BAGIAN 2: NON-MAKANAN BULANAN =====
+function hitungNonMakanan() {
+  const rows = document.querySelectorAll('#rtNonMakananList .rt-row');
+  const items = bacaItemRows(rows);
+  const totalBulan = items.reduce((s, it) => s + it.bulanan, 0);
+
+  let html = '';
+  items.forEach(it => {
+    html += `<div class="ringkasan-row"><span class="rk-label">${it.nama}</span><span class="rk-val">${formatRp(it.nilai)}/${it.satuan}</span></div>`;
+  });
+  document.getElementById('ringkasanNonMakanan').innerHTML = html || '<p class="hint">Belum ada item ditambahkan</p>';
+  document.getElementById('rt-nonmakanan-bulan').textContent = formatRp(totalBulan);
+
+  window._lastNonMakanan = { items, totalBulan, totalTahun: totalBulan * 12, waktu: new Date().toLocaleString('id-ID') };
+}
+
+function salinNonMakanan() {
+  const h = window._lastNonMakanan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  let teks = `=== PENGELUARAN NON-MAKANAN (BULANAN) ===\n\n`;
+  h.items.forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /${it.satuan}\n`);
+  teks += `\n------------------------------------\n`;
+  teks += `TOTAL / BULAN : ${formatRp(h.totalBulan)}\n`;
+  teks += `TOTAL / TAHUN : ${formatRp(h.totalTahun)}\n`;
+  teks += `====================================`;
+  copyToClipboard(teks);
+}
+
+function simpanRiwayatNonMakanan() {
+  hitungNonMakanan();
+  const h = window._lastNonMakanan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  const nama = getCurrentNama();
+  if (!nama) { showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu'); return; }
+  pushOrReplaceRiwayat({ tipe: 'nonmakanan', nama, ...h });
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+function resetNonMakanan() {
+  document.getElementById('rtNonMakananList').innerHTML = '';
+  document.getElementById('ringkasanNonMakanan').innerHTML = '';
+  document.getElementById('rt-nonmakanan-bulan').textContent = 'Rp 0';
+  window._lastNonMakanan = null;
+}
+
+// ===== BAGIAN 3: TAHUNAN NON-MAKANAN =====
+function hitungTahunan() {
+  const rows = document.querySelectorAll('#rtTahunanList .rt-row');
+  const items = bacaItemRows(rows, 'tahun');
+  const totalTahun = items.reduce((s, it) => s + it.nilai, 0);
+
+  let html = '';
+  items.forEach(it => {
+    html += `<div class="ringkasan-row"><span class="rk-label">${it.nama}</span><span class="rk-val">${formatRp(it.nilai)}/tahun</span></div>`;
+  });
+  document.getElementById('ringkasanTahunan').innerHTML = html || '<p class="hint">Belum ada item ditambahkan</p>';
+  document.getElementById('rt-tahunan-tahun').textContent = formatRp(totalTahun);
+
+  window._lastTahunan = { items, totalTahun, totalBulan: totalTahun / 12, waktu: new Date().toLocaleString('id-ID') };
+}
+
+function salinTahunan() {
+  const h = window._lastTahunan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  let teks = `=== PENGELUARAN TAHUNAN NON-MAKANAN ===\n\n`;
+  h.items.forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /tahun\n`);
+  teks += `\n------------------------------------\n`;
+  teks += `TOTAL / TAHUN : ${formatRp(h.totalTahun)}\n`;
+  teks += `(≈ ${formatRp(h.totalBulan)} /bulan)\n`;
+  teks += `====================================`;
+  copyToClipboard(teks);
+}
+
+function simpanRiwayatTahunan() {
+  hitungTahunan();
+  const h = window._lastTahunan;
+  if (!h || !h.items.length) { showToast('⚠️ Tambah item dulu'); return; }
+  const nama = getCurrentNama();
+  if (!nama) { showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu'); return; }
+  pushOrReplaceRiwayat({ tipe: 'tahunanrt', nama, ...h });
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+function resetTahunan() {
+  document.getElementById('rtTahunanList').innerHTML = '';
+  document.getElementById('ringkasanTahunan').innerHTML = '';
+  document.getElementById('rt-tahunan-tahun').textContent = 'Rp 0';
+  window._lastTahunan = null;
+}
+
+// ===== NILAI ASET (Rincian 28) =====
+const ASET_LABELS = {
+  a: '28.a Tanah',
+  b: '28.b Bangunan',
+  c: '28.c Mesin & Peralatan',
+  d: '28.d Kendaraan Usaha',
+  e: '28.e Aset Lainnya'
+};
+
+const PLACEHOLDER_ASET = {
+  a: 'Contoh: Tanah lokasi usaha',
+  b: 'Contoh: Bangunan utama, Gudang',
+  c: 'Contoh: Mesin produksi, Peralatan',
+  d: 'Contoh: Motor, Mobil, Truk',
+  e: 'Contoh: Stok barang, Piutang'
+};
+
+function tambahItemAset(kategori) {
+  produksiCounter++;
+  const id = produksiCounter;
+  const div = document.createElement('div');
+  div.className = 'rt-row';
+  div.id = 'aset' + kategori + '-' + id;
+  div.innerHTML = `
+    <div class="rt-row-line1">
+      <div class="input-wrap biaya-nama">
+        <input type="text" placeholder="${PLACEHOLDER_ASET[kategori]}" oninput="hitungAset()">
+      </div>
+      <button class="del-btn" onclick="hapusItemAset('${kategori}', ${id})">×</button>
+    </div>
+    <div class="rt-row-line2">
+      <div class="input-wrap" style="flex:1">
+        <span class="input-prefix">Rp</span>
+        <input type="text" inputmode="numeric" class="rp-input" placeholder="0" oninput="hitungAset()">
+      </div>
+    </div>
+  `;
+  document.getElementById('aset28' + kategori + 'List').appendChild(div);
+  hitungAset();
+}
+
+function hapusItemAset(kategori, id) {
+  const el = document.getElementById('aset' + kategori + '-' + id);
+  if (el) el.remove();
+  hitungAset();
+}
+
+function getItemsAset(kategori) {
+  const rows = document.querySelectorAll('#aset28' + kategori + 'List .rt-row');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    const nama = inputs[0].value || 'Item';
+    const nilai = parseRp(inputs[1].value);
+    return { nama, nilai };
+  });
+}
+
+function hitungAset() {
+  const itemsA = getItemsAset('a');
+  const itemsB = getItemsAset('b');
+  const itemsC = getItemsAset('c');
+  const itemsD = getItemsAset('d');
+  const itemsE = getItemsAset('e');
+
+  const a = itemsA.reduce((s, it) => s + it.nilai, 0);
+  const b = itemsB.reduce((s, it) => s + it.nilai, 0);
+  const c = itemsC.reduce((s, it) => s + it.nilai, 0);
+  const d = itemsD.reduce((s, it) => s + it.nilai, 0);
+  const e = itemsE.reduce((s, it) => s + it.nilai, 0);
+  const total = a + b + c + d + e;
+
+  document.getElementById('aset28a-subtotal').textContent = formatRp(a);
+  document.getElementById('aset28b-subtotal').textContent = formatRp(b);
+  document.getElementById('aset28c-subtotal').textContent = formatRp(c);
+  document.getElementById('aset28d-subtotal').textContent = formatRp(d);
+  document.getElementById('aset28e-subtotal').textContent = formatRp(e);
+
+  const vals = { a, b, c, d, e };
+  let html = '';
+  Object.entries(vals).forEach(([k, v]) => {
+    if (v > 0) {
+      html += `<div class="ringkasan-row"><span class="rk-label">${ASET_LABELS[k]}</span><span class="rk-val plus">${formatRp(v)}</span></div>`;
+    }
+  });
+  document.getElementById('ringkasanAset').innerHTML = html || '<p class="hint">Belum ada nilai diisi</p>';
+  document.getElementById('aset-total').textContent = formatRp(total);
+  document.getElementById('aset-terbilang').textContent = total > 0 ? terbilang(total) : '';
+
+  window._lastAset = {
+    a, b, c, d, e, total,
+    itemsA, itemsB, itemsC, itemsD, itemsE,
+    waktu: new Date().toLocaleString('id-ID')
+  };
+}
+
+function salinAset() {
+  const h = window._lastAset;
+  if (!h || !h.total) { showToast('⚠️ Isi dulu nilai asetnya'); return; }
+
+  const rincian = (items) => items.filter(it => it.nilai > 0).map(it => `    ↳ ${it.nama}: ${formatRp(it.nilai)}\n`).join('');
+
+  const teks = `=== RINCIAN 28. NILAI ASET USAHA ===
+28.a Tanah                  : ${formatRp(h.a)}
+${rincian(h.itemsA)}28.b Bangunan               : ${formatRp(h.b)}
+${rincian(h.itemsB)}28.c Mesin & Peralatan      : ${formatRp(h.c)}
+${rincian(h.itemsC)}28.d Kendaraan Usaha        : ${formatRp(h.d)}
+${rincian(h.itemsD)}28.e Aset Lainnya           : ${formatRp(h.e)}
+${rincian(h.itemsE)}------------------------------------
+28.f TOTAL NILAI ASET        : ${formatRp(h.total)}
+(${terbilang(h.total)})
+====================================`;
+  copyToClipboard(teks);
+}
+
+function simpanRiwayatAset() {
+  hitungAset();
+  const h = window._lastAset;
+  if (!h || !h.total) { showToast('⚠️ Isi dulu nilai asetnya'); return; }
+  const nama = getCurrentNama();
+  if (!nama) { showToast('⚠️ Isi Nama Usaha di tab Kalkulator dulu'); return; }
+  pushOrReplaceRiwayat({ tipe: 'nilaiAset', nama, ...h });
+  showToast(window._editingId ? '✅ Riwayat diperbarui!' : '💾 Tersimpan ke riwayat!');
+  finishEdit();
+}
+
+function resetAset() {
+  ['a','b','c','d','e'].forEach(k => {
+    document.getElementById('aset28' + k + 'List').innerHTML = '';
+    document.getElementById('aset28' + k + '-subtotal').textContent = 'Rp 0';
+  });
+  document.getElementById('ringkasanAset').innerHTML = '';
+  document.getElementById('aset-total').textContent = 'Rp 0';
+  document.getElementById('aset-terbilang').textContent = '';
+  window._lastAset = null;
+}
+
+// ===== UTILS =====
+function formatRp(n) {
+  if (isNaN(n)) return 'Rp 0';
+  return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+}
+
+// Mengambil angka bersih dari input rp-input (menghapus titik pemisah ribuan)
+function parseRp(value) {
+  if (!value) return 0;
+  const bersih = String(value).replace(/\./g, '').replace(/[^0-9]/g, '');
+  return bersih ? parseInt(bersih, 10) : 0;
+}
+
+// Format otomatis saat mengetik di semua input bertanda class "rp-input"
+// (termasuk yang dibuat dinamis lewat JS), menggunakan event delegation.
+document.addEventListener('input', function(e) {
+  if (!e.target.classList || !e.target.classList.contains('rp-input')) return;
+
+  const input = e.target;
+  const cursorFromEnd = input.value.length - input.selectionStart;
+  const angka = parseRp(input.value);
+
+  input.value = angka ? angka.toLocaleString('id-ID') : '';
+
+  const newPos = Math.max(input.value.length - cursorFromEnd, 0);
+  input.setSelectionRange(newPos, newPos);
+});
+
+function terbilang(n) {
+  n = Math.abs(Math.round(n));
+  if (n >= 1e12) return (n / 1e12).toFixed(2).replace('.', ',') + ' triliun';
+  if (n >= 1e9) return (n / 1e9).toFixed(2).replace('.', ',') + ' miliar';
+  if (n >= 1e6) return (n / 1e6).toFixed(2).replace('.', ',') + ' juta';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace('.', ',') + ' ribu';
+  return n.toString();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== SALIN KE CLIPBOARD (dengan fallback untuk WebView/HTTP) =====
+function copyToClipboard(teks) {
+  // Cara 1: Clipboard API modern (butuh HTTPS/localhost + permission)
+  if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+    navigator.clipboard.writeText(teks).then(() => {
+      showToast('📋 Disalin!');
+    }).catch(() => {
+      fallbackCopy(teks);
+    });
+  } else {
+    fallbackCopy(teks);
+  }
+}
+
+function fallbackCopy(teks) {
+  // Cara 2: textarea sementara + execCommand (kompatibel WebView lama / file:// / HTTP)
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = teks;
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    ta.style.left = '-9999px';
+    ta.setAttribute('readonly', '');
+    document.body.appendChild(ta);
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      const range = document.createRange();
+      range.selectNodeContents(ta);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      ta.setSelectionRange(0, teks.length);
+    } else {
+      ta.select();
+    }
+
+    const success = document.execCommand('copy');
+    document.body.removeChild(ta);
+
+    if (success) {
+      showToast('📋 Disalin!');
+    } else {
+      showToast('⚠️ Gagal salin otomatis, salin manual ya');
+    }
+  } catch (err) {
+    showToast('⚠️ Gagal salin otomatis, salin manual ya');
+  }
+}
+
+// Init
+updateHariHint();
+// Jalankan migrasi data lama → schema responden (sekali, idempotent)
+try {
+  const n = migrateOldRiwayat();
+  if (n > 0) console.log('[Migrasi] ' + n + ' responden baru dari riwayat lama');
+} catch(e) { console.warn('Migrasi gagal:', e); }
+// Render banner responden aktif
+renderRespondenAktifBar();
+// Kalau ada responden aktif, restore nama-nya ke input
+if (respondenAktif && respondenDB[respondenAktif]) {
+  const inp = document.getElementById('namaUsaha');
+  if (inp && !inp.value) inp.value = respondenDB[respondenAktif].nama;
+}
+</script>
+
+<!-- INSTALL BANNER -->
+<div id="installBanner">
+  <div class="install-icon">📲</div>
+  <div class="install-text">
+    <strong>Pasang di HP kamu</strong>
+    <span>Bisa dipakai offline, tanpa buka browser</span>
+  </div>
+  <div class="install-actions">
+    <button class="install-yes" id="installYes">Pasang</button>
+    <button class="install-no" id="installNo">Nanti</button>
+  </div>
+</div>
+
+<!-- OFFLINE INDICATOR -->
+<div id="offlineBadge">⚡ Mode Offline</div>
+
+<script>
+// ===== PWA: SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// ===== PWA: INSTALL BANNER =====
+let deferredPrompt = null;
+const banner = document.getElementById('installBanner');
+const btnYes = document.getElementById('installYes');
+const btnNo  = document.getElementById('installNo');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Tampilkan banner setelah 3 detik
+  setTimeout(() => {
+    if (deferredPrompt) banner.classList.add('visible');
+  }, 3000);
+});
+
+btnYes.addEventListener('click', async () => {
+  banner.classList.remove('visible');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') showToast('✅ Aplikasi berhasil dipasang!');
+    deferredPrompt = null;
+  }
+});
+
+btnNo.addEventListener('click', () => {
+  banner.classList.remove('visible');
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  showToast('✅ SE2026 sudah terpasang!');
+  banner.classList.remove('visible');
+});
+
+// ===== OFFLINE DETECTOR =====
+const offlineBadge = document.getElementById('offlineBadge');
+
+function updateOnlineStatus() {
+  if (!navigator.onLine) {
+    offlineBadge.classList.add('show');
+  } else {
+    offlineBadge.classList.remove('show');
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+</script>
+
+<script>
+// ===== SISTEM AKTIVASI KODE (1 KODE = 1 PERANGKAT) =====
+// GANTI URL INI dengan URL Web App dari Google Apps Script Anda
+const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzUMVTcWHvlpRiWK7runS6kg0tZrdmEzLJvKjCgenKGm3pZkc4hbfaASmP-bd5tb3j6sw/exec';
+
+const LOCK_STORAGE_KEY = 'se2026_kode_aktif_v1';
+
+const lockScreen = document.getElementById('lockScreen');
+const lockBox    = document.getElementById('lockBox');
+const inputKode  = document.getElementById('kodeAkses');
+const lockMsg    = document.getElementById('lockMsg');
+const btnAktivasi = document.getElementById('btnAktivasi');
+
+// Cek apakah HP ini sudah pernah aktivasi sebelumnya
+(async function initLock() {
+  const tersimpan = localStorage.getItem(LOCK_STORAGE_KEY);
+
+  if (!tersimpan) {
+    // Belum pernah aktivasi -> tampilkan lock screen
+    return;
+  }
+
+  // Pernah aktivasi di HP ini. Jika offline, percaya localStorage (boleh masuk).
+  if (!navigator.onLine) {
+    lockScreen.classList.add('hidden');
+    return;
+  }
+
+  // Jika online, verifikasi ulang ke server untuk kode tersimpan ini.
+  try {
+    const device = encodeURIComponent(getDeviceFingerprint());
+    const url = `${URL_APPS_SCRIPT}?action=cek&kode=${encodeURIComponent(tersimpan)}&device=${device}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.success && data.status === 'aktif') {
+      // Kode ini memang yang mengaktifkan -> boleh masuk
+      lockScreen.classList.add('hidden');
+    } else {
+      // Status 'belum', 'aktif_beda_device', atau lainnya -> minta kode lagi
+      localStorage.removeItem(LOCK_STORAGE_KEY);
+    }
+  } catch (err) {
+    // Gagal cek ke server -> tetap percaya localStorage agar tidak mengunci user offline
+    lockScreen.classList.add('hidden');
+  }
+})();
+
+function showLockMsg(text, type) {
+  lockMsg.textContent = text;
+  lockMsg.className = 'lock-msg show ' + type;
+}
+
+function setLockLoading(loading) {
+  btnAktivasi.disabled = loading;
+  btnAktivasi.innerHTML = loading
+    ? '<span class="lock-spinner"></span>Memeriksa...'
+    : 'Buka Aplikasi';
+}
+
+function getDeviceFingerprint() {
+  // Info sederhana untuk catatan admin (bukan untuk keamanan ketat)
+  const ua = navigator.userAgent.substring(0, 80);
+  const screenInfo = `${window.screen.width}x${window.screen.height}`;
+  return `${ua} | ${screenInfo}`;
+}
+
+async function aktivasiKode() {
+  const kode = inputKode.value.trim().toUpperCase();
+
+  if (!kode) {
+    showLockMsg('⚠️ Masukkan kode akses terlebih dahulu.', 'error');
+    return;
+  }
+
+  if (URL_APPS_SCRIPT === 'GANTI_URL_APPS_SCRIPT') {
+    showLockMsg('⚠️ Sistem belum dikonfigurasi. Hubungi admin.', 'error');
+    return;
+  }
+
+  if (!navigator.onLine) {
+    showLockMsg('⚠️ Aktivasi pertama kali butuh koneksi internet. Sambungkan ke WiFi/data lalu coba lagi.', 'error');
+    return;
+  }
+
+  setLockLoading(true);
+  lockMsg.classList.remove('show');
+
+  try {
+    const device = encodeURIComponent(getDeviceFingerprint());
+    const url = `${URL_APPS_SCRIPT}?action=aktivasi&kode=${encodeURIComponent(kode)}&device=${device}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    setLockLoading(false);
+
+    if (data.success) {
+      localStorage.setItem(LOCK_STORAGE_KEY, kode);
+      showLockMsg('✅ Aktivasi berhasil! Membuka aplikasi...', 'info');
+      setTimeout(() => {
+        lockScreen.classList.add('hidden');
+      }, 800);
+    } else {
+      showLockMsg('⚠️ ' + (data.message || 'Kode tidak valid.'), 'error');
+      lockBox.style.animation = 'none';
+      setTimeout(() => { lockBox.style.animation = 'shake 0.3s'; }, 10);
+    }
+  } catch (err) {
+    setLockLoading(false);
+    showLockMsg('⚠️ Gagal menghubungi server. Periksa koneksi internet dan coba lagi.', 'error');
+  }
+}
+
+inputKode.addEventListener('keypress', e => { if (e.key === 'Enter') aktivasiKode(); });
+</script>
+</body>
+</html>
