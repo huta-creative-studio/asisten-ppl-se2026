@@ -4490,7 +4490,7 @@ window.simpanSemuaResponden = function() {
 // ===== PWA: SERVICE WORKER =====
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./frontend/public/sw.js')
+    navigator.serviceWorker.register('frontend/public/sw.js')
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.log('SW error:', err));
   });
@@ -4667,7 +4667,7 @@ inputKode.addEventListener('keypress', e => { if (e.key === 'Enter') aktivasiKod
 // Register service worker (offline support + cache)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./frontend/public/sw.js')
+    navigator.serviceWorker.register('frontend/public/sw.js')
       .then(reg => console.log('[PWA] SW registered:', reg.scope))
       .catch(err => console.warn('[PWA] SW registration failed:', err));
   });
