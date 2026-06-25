@@ -1,11 +1,12 @@
 // Service Worker untuk Asisten Petugas SE2026 — offline-first
 const CACHE_NAME = 'se2026-v2';
 const PRECACHE_URLS = [
-  '/se2026-app.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/apple-touch-icon.png',
+  '/asisten-ppl-se2026/index.html',
+  '/asisten-ppl-se2026/frontend/public/se2026-app.html',
+  '/asisten-ppl-se2026/frontend/public/manifest.json',
+  '/asisten-ppl-se2026/frontend/public/icon-192.png',
+  '/asisten-ppl-se2026/frontend/public/icon-512.png',
+  '/asisten-ppl-se2026/frontend/public/apple-touch-icon.png',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'
 ];
 
