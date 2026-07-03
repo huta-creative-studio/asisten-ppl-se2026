@@ -1130,6 +1130,14 @@ function hitung(idx) {
   document.getElementById('res-laba-tahun_' + idx).textContent = formatRp(labaTahun);
   document.getElementById('res-laba-terbilang_' + idx).textContent = terbilang(labaTahun);
 
+  // Warnai nilai laba merah jika rugi (negatif), biru normal jika untung —
+  // supaya rugi langsung terlihat jelas tanpa perlu scroll ke banner peringatan.
+  const labaWarna = labaTahun < 0 ? 'var(--red)' : 'var(--bps-blue)';
+  [`res-laba-hari_${idx}`, `res-laba-bulan_${idx}`, `res-laba-tahun_${idx}`].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.color = labaWarna;
+  });
+
   // Ringkasan biaya — pakai breakdown 26.a-e per TAHUN
   let ringHTML = '';
   ringHTML += `<div class="ringkasan-row"><span class="rk-label">Omzet / Tahun</span><span class="rk-val plus">${formatRp(omzetTahun * faktorMusim)}</span></div>`;

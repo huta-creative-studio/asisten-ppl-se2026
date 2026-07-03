@@ -18,6 +18,7 @@
     --border: #e2e5ea;
     --green: #1f8a4c;
     --green-bg: #eaf7ef;
+    --blue-bg: #eaf1fb;
     --red: #c0392b;
     --red-bg: #fdecea;
     --radius: 12px;
@@ -38,6 +39,7 @@
       --border: #2b3038;
       --green: #4abf6e;
       --green-bg: #1c3b27;
+      --blue-bg: #1c2b3f;
       --red: #ef6b5d;
       --red-bg: #3a1f1c;
       --shadow: 0 2px 12px rgba(0,0,0,0.5);
@@ -150,7 +152,7 @@
   .jenis-card:hover { border-color: var(--bps-light); }
   .jenis-card.selected {
     border-color: var(--bps-blue);
-    background: var(--green-bg);
+    background: var(--blue-bg);
   }
   .jenis-card .icon { font-size: 26px; display: block; margin-bottom: 6px; }
   .jenis-card .label { font-size: 12px; font-weight: 600; color: var(--text); }
@@ -340,8 +342,8 @@
     padding: 14px;
     text-align: center;
   }
-  .hasil-box.harian { background: var(--green-bg); border: 1.5px solid var(--bps-light); }
-  .hasil-box.bulanan { background: var(--green-bg); border: 1.5px solid #a3d9b8; }
+  .hasil-box.harian { background: var(--blue-bg); border: 1.5px solid var(--bps-light); }
+  .hasil-box.bulanan { background: var(--blue-bg); border: 1.5px solid #bcd4ee; }
   .hasil-box.tahunan { background: var(--accent-soft); border: 1.5px solid #f0d090; grid-column: span 2; }
   .hasil-box .hasil-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .hasil-box .hasil-nilai {
@@ -715,7 +717,7 @@
     transition: border-color 0.2s;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231d6b2e' d='M6 8L0 2l1.4-1.4L6 5.2 10.6.6 12 2z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%232b5fa8' d='M6 8L0 2l1.4-1.4L6 5.2 10.6.6 12 2z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
     padding-right: 38px;
@@ -746,7 +748,7 @@
   .tk-summary {
     margin-top: 12px;
     padding: 12px 14px;
-    background: var(--green-bg);
+    background: var(--blue-bg);
     border-radius: 8px;
     font-size: 12px;
   }
@@ -781,7 +783,7 @@
     border-radius: 8px;
   }
   .r26-row.total {
-    background: var(--green-bg);
+    background: var(--blue-bg);
     border-color: var(--bps-light);
     border-width: 1.5px;
     margin-top: 6px;
