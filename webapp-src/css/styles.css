@@ -1,40 +1,41 @@
   /* System fonts - 100% offline, no internet needed */
 
   /* ============================================================
-     EDIT WARNA — Skema saat ini: HIJAU PERTANIAN / ALAM
+     EDIT WARNA — Skema saat ini: NETRAL ABU-ABU/PUTIH + AKSEN BIRU
+     (Palet lebih soft & kontras teks lebih nyaman dibaca)
      ============================================================ */
   :root {
     --font-ui: 'Google Sans', 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
     --font-mono: 'Roboto Mono', 'Courier New', monospace;
-    --bps-blue: #1d6b2e;          /* primary (hijau tua) */
-    --bps-light: #3a9442;         /* hijau segar */
-    --accent: #c97138;            /* aksen oranye terakota */
-    --accent-soft: #faeadf;
-    --bg: #f3f7f1;
+    --bps-blue: #2b5fa8;          /* primary (biru BPS, soft) */
+    --bps-light: #4a80c9;         /* biru terang untuk hover/aksen */
+    --accent: #d17a1f;            /* aksen oranye hangat (dipakai seperlunya) */
+    --accent-soft: #fbeee0;
+    --bg: #f4f5f7;                /* netral abu-abu terang */
     --card: #ffffff;
-    --text: #1a2a1f;
-    --muted: #6b7a6f;
-    --border: #d5e3d2;
-    --green: #1a8a4a;
-    --green-bg: #e8f7ee;
+    --text: #263140;              /* abu-abu gelap kebiruan, lebih lembut dari hitam */
+    --muted: #6b7684;
+    --border: #e2e5ea;
+    --green: #1f8a4c;
+    --green-bg: #eaf7ef;
     --red: #c0392b;
     --red-bg: #fdecea;
     --radius: 12px;
-    --shadow: 0 2px 12px rgba(29,107,46,0.10);
+    --shadow: 0 2px 12px rgba(38,49,64,0.08);
   }
 
   /* DARK MODE otomatis mengikuti preferensi sistem */
   @media (prefers-color-scheme: dark) {
     :root {
-      --bps-blue: #2f9648;
-      --bps-light: #4ab964;
-      --accent: #e8954b;
-      --accent-soft: #3a2a1f;
-      --bg: #121915;
-      --card: #1c2520;
-      --text: #e6eee8;
-      --muted: #9bb0a2;
-      --border: #2c3a30;
+      --bps-blue: #5b9bdb;
+      --bps-light: #7cb3e8;
+      --accent: #e8a558;
+      --accent-soft: #3a2c1f;
+      --bg: #14171c;
+      --card: #1d2127;
+      --text: #e7eaee;
+      --muted: #9aa4b0;
+      --border: #2b3038;
       --green: #4abf6e;
       --green-bg: #1c3b27;
       --red: #ef6b5d;
@@ -62,31 +63,31 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.15);
   }
   .header-inner {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 20px;
+    padding: 14px 20px;
   }
   .logo-badge {
-    background: var(--accent);
+    background: #ffffff;
     color: var(--bps-blue);
-    font-weight: 700;
+    font-weight: 800;
     font-size: 11px;
     letter-spacing: 0.5px;
-    padding: 4px 8px;
+    padding: 5px 9px;
     border-radius: 6px;
     white-space: nowrap;
   }
   .header-title { flex: 1; }
-  .header-title h1 { font-size: 15px; font-weight: 700; line-height: 1.2; }
-  .header-title p { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  .header-title h1 { font-size: 16px; font-weight: 700; line-height: 1.25; letter-spacing: 0.1px; }
+  .header-title p { font-size: 11.5px; opacity: 0.88; margin-top: 2px; }
 
   .tab-nav {
     display: flex;
-    background: rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.12);
     border-top: 1px solid rgba(255,255,255,0.12);
     overflow-x: auto;
     scrollbar-width: none;
@@ -99,7 +100,7 @@
     padding: 10px 8px;
     background: none;
     border: none;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.75);
     font-family: inherit;
     font-size: 11px;
     font-weight: 600;
@@ -109,9 +110,9 @@
     letter-spacing: 0.3px;
   }
   .tab-btn.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-    background: rgba(232,160,32,0.08);
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+    background: rgba(255,255,255,0.12);
   }
 
   /* Inner tabs for multiple usaha */

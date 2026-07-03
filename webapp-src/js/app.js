@@ -303,6 +303,13 @@ function mulaiRespondenBaru() {
   }
   respondenAktif = null;
   persistRespondenDB();
+  // Reset identitas responden (No. Urut Keluarga, No. Urut Bangunan, Nama Keluarga)
+  try {
+    const kk = document.getElementById('nomorKeluargaRes'); if (kk) kk.value = '';
+    const bg = document.getElementById('nomorBangunanRes'); if (bg) bg.value = '';
+    const nm = document.getElementById('namaResponden');    if (nm) nm.value = '';
+    const pk = document.getElementById('pekerjaanResponden'); if (pk) pk.value = 'Pemilik Usaha';
+  } catch(e){}
   // Reset SEMUA usaha (1 sd. 5) — bukan cuma usaha #1
   for (let i = 1; i <= 5; i++) {
     try { resetForm(i); } catch(e) { console.warn('resetForm '+i+':', e); }
@@ -1741,7 +1748,7 @@ function renderRiwayat() {
       if (r.pendapatan) parts.push('💵 Pend');
       const status = r.status || 'draft';
       const statusBadge = status === 'final'
-        ? '<span style="background:#1d6b2e;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:6px">✅ FINAL</span>'
+        ? '<span style="background:var(--green);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:6px">✅ FINAL</span>'
         : '<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:6px">📝 DRAFT</span>';
       const geoBadge = (r.geo && r.geo.lat)
         ? `<span style="background:#e3f2fd;color:#1565c0;padding:2px 8px;border-radius:12px;font-size:11px;margin-left:4px" title="${r.geo.lat}, ${r.geo.lon}">📍 Geo</span>`
@@ -1827,15 +1834,14 @@ function renderRiwayat() {
         detailHtml += `<div class="ri-detail-row" style="margin-top:6px"><b>Pendapatan (Rincian 18.a)</b><span></span></div>`;
         detailHtml += `<div class="ri-detail-row"><span>Jumlah Anggota</span><span>${(p.orang||[]).length} orang</span></div>`;
         (p.orang || []).forEach(o => {
-          const tag = o.isPemilikUsaha ? '👤 ' : '';
-          detailHtml += `<div class="ri-detail-row" style="font-size:12px;color:#555"><span>↳ ${tag}${o.nama||'(?)'} <i>(${o.relasi||''})</i></span><span>${formatRp(o.total||0)}/bln</span></div>`;
+          detailHtml += `<div class="ri-detail-row" style="font-size:12px;color:#555"><span>↳ ${o.nama||'(?)'} <i>(${o.relasi||''})</i></span><span>${formatRp(o.total||0)}/bln</span></div>`;
         });
         detailHtml += `<div class="ri-detail-row"><span>Total Anggota/Bulan</span><span>${formatRp(p.totalAnggotaBulan||0)}</span></div>`;
         detailHtml += `<div class="ri-detail-row"><span>+ Laba Usaha/Bulan</span><span>${formatRp(p.labaUsahaBulan||0)}</span></div>`;
         detailHtml += `<div class="ri-detail-row" style="color:var(--bps-blue);font-weight:700"><span>Total Pendapatan/Bulan</span><span>${formatRp(p.totalBulan||0)}</span></div>`;
         detailHtml += `<div class="ri-detail-row"><span>Total Pendapatan/Tahun</span><span>${formatRp(p.totalTahun||0)}</span></div>`;
         const surplus = p.surplus || 0;
-        const surColor = surplus >= 0 ? '#1d6b2e' : '#b22';
+        const surColor = surplus >= 0 ? 'var(--green)' : '#b22';
         detailHtml += `<div class="ri-detail-row" style="color:${surColor};font-weight:700"><span>${surplus>=0?'Surplus':'Defisit'}/Bulan</span><span>${formatRp(Math.abs(surplus))}</span></div>`;
       }
       if (r.geo && r.geo.lat) {
@@ -1857,7 +1863,7 @@ function renderRiwayat() {
           <div id="${did}" class="ri-detail-body" style="display:none">${detailHtml || '<i>Belum ada data</i>'}</div>
           <div class="ri-footer" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">
             <button class="ri-btn edit" onclick='editResponden("${k.replace(/"/g,'\\"')}")'>✏️ Buka</button>
-            <button class="ri-btn" style="background:${status==='final'?'#fff3e0':'#e8f5e9'};color:${status==='final'?'#e65100':'#1d6b2e'};border:1px solid ${status==='final'?'#e65100':'#1d6b2e'}" onclick='toggleStatusResponden("${k.replace(/"/g,'\\"')}")'>${status==='final'?'📝 Ubah ke Draft':'✅ Tandai Final'}</button>
+            <button class="ri-btn" style="background:${status==='final'?'#fff3e0':'var(--green-bg)'};color:${status==='final'?'#e65100':'var(--green)'};border:1px solid ${status==='final'?'#e65100':'var(--green)'}" onclick='toggleStatusResponden("${k.replace(/"/g,'\\"')}")'>${status==='final'?'📝 Ubah ke Draft':'✅ Tandai Final'}</button>
             <button class="ri-btn" style="background:#e3f2fd;color:#1565c0;border:1px solid #1565c0" onclick='salinDataResponden("${k.replace(/"/g,'\\"')}")'>📋 Salin Data</button>
             <button class="ri-btn" style="background:#fff3e0;color:#e65100;border:1px solid #e65100" onclick='screenshotResponden("${k.replace(/"/g,'\\"')}", "ri-card-${k.replace(/[^a-zA-Z0-9]/g,'-')}")'>📸 Simpan Gambar</button>
             <button class="ri-btn del" onclick='hapusResponden("${k.replace(/"/g,'\\"')}")'>🗑️ Hapus</button>
@@ -2103,6 +2109,20 @@ function editResponden(key) {
   const r26 = r.rincian26 || findInRiwayat('biayausaha');
   if (r26 && !r26ByUsaha) { try { populateBiayaUsaha(r26); } catch(e){} }
 
+  // NEW: auto "Hitung Penghasilan" untuk setiap usaha yang sudah punya omzet
+  // terisi, supaya saat buka riwayat/profil responden yang punya usaha, hasil
+  // kalkulasi (omzet & laba bersih hari/bulan/tahun) langsung tampil tanpa
+  // harus klik tombol "HITUNG PENGHASILAN" manual per usaha.
+  try {
+    for (let i = 1; i <= 5; i++) {
+      if (jumlahUsahaProfil && i > jumlahUsahaProfil) break;
+      const omzetEl = document.getElementById('omzet_' + i);
+      if (omzetEl && parseRp(omzetEl.value) > 0) {
+        try { hitung(i); } catch(e) { console.warn('auto-hitung usaha', i, e); }
+      }
+    }
+  } catch(e) {}
+
 
   // Restore geo-tagging (kalau pernah ditandai)
   if (r.geo && r.geo.lat) { _geoData = r.geo; }
@@ -2214,8 +2234,7 @@ function salinDataResponden(key) {
     lines.push('── PENDAPATAN (RINCIAN 18.a) ──');
     lines.push(`Jumlah Anggota   : ${(p.orang||[]).length} orang`);
     (p.orang||[]).forEach(o => {
-      const tag = o.isPemilikUsaha ? '[OWNER] ' : '';
-      lines.push(`  ${tag}${o.nama||'(?)'} (${o.relasi||''}) : ${formatRp(o.total||0)}/bln`);
+      lines.push(`  ${o.nama||'(?)'} (${o.relasi||''}) : ${formatRp(o.total||0)}/bln`);
     });
     lines.push(`Total Anggota/Bulan : ${formatRp(p.totalAnggotaBulan||0)}`);
     lines.push(`+ Laba Usaha/Bulan  : ${formatRp(p.labaUsahaBulan||0)}`);
@@ -2388,12 +2407,12 @@ function _renderRiwayatLegacy_unused() {
       judul = '💵 Pendapatan Rumah Tangga (Rincian 18.a)';
       ringkas = `Total/Bln: <b>${formatRp(r.totalBulan)}</b> · ${(r.orang||[]).length} anggota`;
       (r.orang||[]).forEach(o => {
-        detail += `<div class="ri-detail-row"><span>${o.isPemilikUsaha?'👤 ':''}${o.nama||'(?)'} (${o.relasi})</span><span>${formatRp(o.total)}/bln</span></div>`;
+        detail += `<div class="ri-detail-row"><span>${o.nama||'(?)'} (${o.relasi})</span><span>${formatRp(o.total)}/bln</span></div>`;
       });
       detail += `<div class="ri-detail-row"><span>+ Laba Usaha/Bln</span><span>${formatRp(r.labaUsahaBulan||0)}</span></div>`;
       detail += `<div class="ri-detail-row" style="font-weight:700;color:var(--bps-blue);margin-top:6px"><span>Total Pendapatan/Bulan</span><span>${formatRp(r.totalBulan)}</span></div>`;
       detail += `<div class="ri-detail-row"><span>Total Pendapatan/Tahun</span><span>${formatRp(r.totalTahun)}</span></div>`;
-      const surplusColor = (r.surplus||0) >= 0 ? '#1d6b2e' : '#b22';
+      const surplusColor = (r.surplus||0) >= 0 ? 'var(--green)' : '#b22';
       detail += `<div class="ri-detail-row" style="font-weight:700;color:${surplusColor}"><span>${(r.surplus||0)>=0?'Surplus':'Defisit'}/Bln</span><span>${formatRp(Math.abs(r.surplus||0))}</span></div>`;
 
     } else {
@@ -2857,7 +2876,6 @@ function exportRiwayat(format) {
       rt_tahunan_tahun:     tah.totalTahun  || '',
       // ===== Pendapatan/Gaji (Rincian 18.a) =====
       pend_jumlah_anggota:  (r.pendapatan && r.pendapatan.orang) ? r.pendapatan.orang.length : '',
-      pend_nama_owner:      (r.pendapatan && r.pendapatan.orang) ? ((r.pendapatan.orang.find(o => o.isPemilikUsaha) || {}).nama || '') : '',
       pend_total_anggota_bulan: (r.pendapatan && r.pendapatan.totalAnggotaBulan) || '',
       pend_laba_usaha_bulan:    (r.pendapatan && r.pendapatan.labaUsahaBulan)    || '',
       pend_total_bulan:         (r.pendapatan && r.pendapatan.totalBulan)        || '',
@@ -3188,13 +3206,21 @@ function hitungBiayaUsaha(idx) {
   };
 }
 
-function salinBiayaUsaha() {
+function salinBiayaUsaha(idx) {
+  idx = idx || 1;
+  try { if (typeof hitungBiayaUsaha === 'function') hitungBiayaUsaha(idx); } catch (e) {}
   const h = window._lastBiayaUsaha;
   if (!h || !h.total) { showToast('⚠️ Isi dulu rinciannya'); return; }
 
   const rincian = (items) => items.filter(it => it.nilai > 0).map(it => `    ↳ ${it.nama}: ${formatRp(it.nilai)}\n`).join('');
 
-  const teks = `=== RINCIAN 26. PENGELUARAN USAHA ===
+  const teks = `=== TENAGA KERJA & RINCIAN PENGELUARAN USAHA ${idx} (26.a-26.e) ===
+TENAGA KERJA
+  Jumlah Karyawan            : ${h.nKaryawan || 0} orang
+  Gaji / Orang / Bulan       : ${formatRp(h.gajiPerOrang || 0)}
+  Jaminan Sosial / Orang / Bulan : ${formatRp(h.jamsosPerOrang || 0)}
+  Bonus / THR / Orang / Tahun    : ${formatRp(h.thrPerOrang || 0)}
+------------------------------------
 26.a Upah, Gaji & Jaminan Sosial : ${formatRp(h.a)}
 ${rincian(h.itemsA)}26.b Biaya Produksi              : ${formatRp(h.b)}
 ${rincian(h.itemsB)}26.c Biaya Sewa & Jasa Lainnya    : ${formatRp(h.c)}
@@ -3483,7 +3509,7 @@ function tambahAnggotaPendapatan(prefill) {
   const div = document.createElement('div');
   div.className = 'rt-row';
   div.dataset.anggotaId = id;
-  div.style.cssText = 'border:1px solid #d0e3cf;background:#f7faf7;padding:12px;border-radius:10px;margin-bottom:12px;display:block';
+  div.style.cssText = 'border:1px solid var(--border);background:var(--bg);padding:12px;border-radius:10px;margin-bottom:12px;display:block';
 
   const relasiOpts = RELASI_OPTIONS.map(r => `<option value="${r}" ${data.relasi===r?'selected':''}>${r}</option>`).join('');
   const itemsHtml = PENDAPATAN_ITEMS.map(it => `
@@ -3502,10 +3528,6 @@ function tambahAnggotaPendapatan(prefill) {
         oninput="hitungPendapatan()" class="pend-nama" style="flex:2;min-width:140px;padding:8px;border:1px solid #ccc;border-radius:6px" />
       <select class="pend-relasi" oninput="hitungPendapatan()"
         style="flex:1;min-width:120px;padding:8px;border:1px solid #ccc;border-radius:6px">${relasiOpts}</select>
-      <label style="display:flex;gap:6px;align-items:center;font-size:13px;background:#fff5e6;padding:6px 10px;border-radius:6px;cursor:pointer">
-        <input type="checkbox" class="pend-owner" ${data.isPemilikUsaha?'checked':''} onchange="hitungPendapatan()" />
-        <b>Pemilik Usaha</b>
-      </label>
       <button class="remove-btn" onclick="hapusAnggotaPendapatan(this, ${id})" style="background:#fee;color:#c00;border:none;border-radius:6px;padding:6px 10px;cursor:pointer">×</button>
     </div>
     <div class="pend-items">${itemsHtml}</div>
@@ -3574,14 +3596,14 @@ function renderLabaUsahaAlokasi() {
     const labaEl = document.getElementById('res-laba-bulan_' + i);
     const labaVal = labaEl ? parseRpSigned(labaEl.textContent) : 0;
     const labaText = labaEl ? labaEl.textContent : 'Rp 0';
-    const labaColor = labaVal < 0 ? '#b22' : '#1d6b2e';
+    const labaColor = labaVal < 0 ? '#b22' : 'var(--green)';
     const selectedId = window._labaUsahaOwnerMap[i] || '';
     const opts = ['<option value="">— Belum dialokasikan (tetap masuk Total RT) —</option>']
       .concat(anggotaOptions.map(o => `<option value="${o.id}" ${String(o.id) === String(selectedId) ? 'selected' : ''}>${o.label}</option>`))
       .join('');
 
     html += `
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border:1px solid #d0e3cf;background:#f7faf7;padding:10px 12px;border-radius:10px;margin-bottom:10px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;border:1px solid var(--border);background:var(--bg);padding:10px 12px;border-radius:10px;margin-bottom:10px">
       <div style="min-width:160px">
         <b>Usaha ${i}</b>
         <div style="font-size:13px;color:${labaColor}">Laba Bersih/Bulan: <b>${labaText}</b></div>
@@ -3642,8 +3664,7 @@ function hitungPendapatan() {
     const anggotaId = row.dataset.anggotaId;
     const nama = (row.querySelector('.pend-nama')||{}).value || '';
     const relasi = (row.querySelector('.pend-relasi')||{}).value || '';
-    const isPemilikUsaha = !!(row.querySelector('.pend-owner')||{}).checked;
-    const perOrang = { nama, relasi, isPemilikUsaha, anggotaId };
+    const perOrang = { nama, relasi, anggotaId };
     let sub = 0;
     row.querySelectorAll('.pend-nominal').forEach(inp => {
       const k = inp.dataset.item;
@@ -3692,8 +3713,8 @@ function hitungPendapatan() {
 
   const surplusBox = document.getElementById('pend-surplus-box');
   if (surplus >= 0) {
-    surplusBox.style.background = '#e6f4ea';
-    document.getElementById('pend-surplus').style.color = '#1d6b2e';
+    surplusBox.style.background = 'var(--green-bg)';
+    document.getElementById('pend-surplus').style.color = 'var(--green)';
     document.getElementById('pend-rasio').textContent = belanjaBulan > 0
       ? `Pendapatan ${rasio.toFixed(2)}× dari belanja RT (Surplus)`
       : 'Belum ada data belanja RT';
@@ -3716,12 +3737,12 @@ function hitungPendapatan() {
       if (o.labaUsahaAlokasi) {
         const rugi = o.labaUsahaAlokasi < 0;
         const tanda = rugi ? '−' : '+';
-        const warna = rugi ? '#c0392b' : '#1d6b2e';
+        const warna = rugi ? '#c0392b' : 'var(--green)';
         labaTag = `<span style="color:${warna}"> ${tanda} Laba Usaha ${formatRp(Math.abs(o.labaUsahaAlokasi))}</span>`;
       }
       return `
       <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px dashed #eee">
-        <span>${o.isPemilikUsaha ? '👤' : ''} <b>${o.nama || '(Tanpa nama)'}</b> <span style="color:#888">— ${o.relasi}</span>${labaTag}</span>
+        <span><b>${o.nama || '(Tanpa nama)'}</b> <span style="color:#888">— ${o.relasi}</span>${labaTag}</span>
         <b>${formatRp(o.total)}</b>
       </div>`;
     }).join('');
@@ -3776,7 +3797,7 @@ function salinPendapatan() {
   if (!h) { showToast('⚠️ Belum ada data'); return; }
   const lines = [
     '=== PENDAPATAN RUMAH TANGGA ===',
-    ...h.orang.map(o => `${o.isPemilikUsaha?'[OWNER] ':''}${o.nama||'(?)'} (${o.relasi}): ${formatRp(o.total)}/bln`),
+    ...h.orang.map(o => `${o.nama||'(?)'} (${o.relasi}): ${formatRp(o.total)}/bln`),
     `Total Anggota/Bulan: ${formatRp(h.totalAnggotaBulan)}`,
     `+ Laba Usaha/Bulan: ${formatRp(h.labaUsahaBulan)}`,
     `= Total Pendapatan/Bulan: ${formatRp(h.totalBulan)}`,
@@ -4187,7 +4208,7 @@ function renderGeoStatus() {
   if (_geoData && _geoData.lat) {
     status.innerHTML = `✓ <b>${_geoData.lat}, ${_geoData.lon}</b> (±${_geoData.accuracy}m)
       <a href="https://www.google.com/maps?q=${_geoData.lat},${_geoData.lon}" target="_blank" style="color:#1565c0;margin-left:4px">🗺️ Lihat</a>`;
-    status.style.color = '#1d6b2e';
+    status.style.color = 'var(--green)';
     if (btnClear) btnClear.style.display = '';
   } else {
     status.textContent = 'Belum ada koordinat';

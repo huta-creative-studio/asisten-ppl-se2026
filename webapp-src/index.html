@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Asisten Petugas SE2026</title>
 <meta name="description" content="Aplikasi usaha untuk pengisian FASIH BPS SE2026">
-<meta name="theme-color" content="#1d6b2e">
+<meta name="theme-color" content="#2b5fa8">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -72,7 +72,7 @@
 
 <!-- Floating Install PWA button (auto-hidden, muncul jika browser support) -->
 <button id="btnInstallPWA" onclick="installPWA()" data-testid="btn-install-pwa" title="Pasang aplikasi ke Home Screen"
-  style="position:fixed;right:20px;bottom:80px;z-index:91;background:#fff;color:#1d6b2e;border:2px solid #1d6b2e;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.15);cursor:pointer;display:none;align-items:center;gap:6px">
+  style="position:fixed;right:20px;bottom:80px;z-index:91;background:#fff;color:var(--bps-blue);border:2px solid var(--bps-blue);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.15);cursor:pointer;display:none;align-items:center;gap:6px">
   📲 Install App
 </button>
 
@@ -358,6 +358,8 @@
 
     <!-- Compat: bu26aList tidak dipakai (Tenaga Kerja menggantikan), tapi tetap ada agar JS legacy tidak error -->
     <div id="bu26aList_1" style="display:none"></div>
+
+    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(1)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(1)">🧮 HITUNG PENGHASILAN</button>
@@ -581,6 +583,8 @@
     </div>
 
     <div id="bu26aList_2" style="display:none"></div>
+
+    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(2)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(2)">🧮 HITUNG PENGHASILAN</button>
@@ -803,6 +807,8 @@
     </div>
 
     <div id="bu26aList_3" style="display:none"></div>
+
+    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(3)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(3)">🧮 HITUNG PENGHASILAN</button>
@@ -1025,6 +1031,8 @@
     </div>
 
     <div id="bu26aList_4" style="display:none"></div>
+
+    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(4)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(4)">🧮 HITUNG PENGHASILAN</button>
@@ -1247,6 +1255,8 @@
     </div>
 
     <div id="bu26aList_5" style="display:none"></div>
+
+    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(5)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(5)">🧮 HITUNG PENGHASILAN</button>
@@ -1449,7 +1459,6 @@
       <div class="hasil-nilai" id="rt-total-minggu">Rp 0</div>
     </div>
     <button class="copy-btn" style="margin-top:14px" onclick="salinMakanan()">📋 Salin Catatan</button>
-    <button class="reset-btn" onclick="resetMakanan()">↺ Reset Makanan</button>
   </div>
 
   <!-- BAGIAN 2: NON-MAKANAN BULANAN -->
@@ -1465,7 +1474,6 @@
       <div class="hasil-nilai" id="rt-nonmakanan-bulan">Rp 0</div>
     </div>
     <button class="copy-btn" style="margin-top:14px" onclick="salinNonMakanan()">📋 Salin Catatan</button>
-    <button class="reset-btn" onclick="resetNonMakanan()">↺ Reset Non-Makanan</button>
   </div>
 
   <!-- BAGIAN 3: TAHUNAN NON-MAKANAN -->
@@ -1481,7 +1489,6 @@
       <div class="hasil-nilai" id="rt-tahunan-tahun">Rp 0</div>
     </div>
     <button class="copy-btn" style="margin-top:14px" onclick="salinTahunan()">📋 Salin Catatan</button>
-    <button class="reset-btn" onclick="resetTahunan()">↺ Reset Tahunan</button>
   </div>
 </div>
 
@@ -1491,7 +1498,7 @@
   <div class="card">
     <div class="card-title"><span class="dot"></span>💵 Pendapatan Anggota Rumah Tangga</div>
     <p class="hint" style="margin-bottom:12px">
-      Rincian pendapatan per anggota rumah tangga (selaras FASIH 18.a). Tandai checkbox <b>Pemilik Usaha</b> untuk anggota yang merupakan responden usaha ini.
+      Rincian pendapatan per anggota rumah tangga (selaras FASIH 18.a).
     </p>
     <div id="pendapatanList"></div>
     <button class="add-btn" onclick="tambahAnggotaPendapatan()" data-testid="btn-tambah-anggota">+ Tambah Anggota Berpendapatan</button>
@@ -1533,9 +1540,9 @@
       <div class="hasil-label">Total Belanja RT / Bulan (Makanan + Non-Makanan + 1/12 Tahunan)</div>
       <div class="hasil-nilai" id="pend-belanja-bulan">Rp 0</div>
     </div>
-    <div class="hasil-box" id="pend-surplus-box" style="grid-column:unset;margin-top:8px;background:#e6f4ea">
+    <div class="hasil-box" id="pend-surplus-box" style="grid-column:unset;margin-top:8px;background:var(--green-bg)">
       <div class="hasil-label">Surplus / Defisit per Bulan</div>
-      <div class="hasil-nilai" id="pend-surplus" style="color:#1d6b2e">Rp 0</div>
+      <div class="hasil-nilai" id="pend-surplus" style="color:var(--green)">Rp 0</div>
       <div class="hasil-terbilang" id="pend-rasio" style="font-size:13px;color:#555">—</div>
     </div>
 
