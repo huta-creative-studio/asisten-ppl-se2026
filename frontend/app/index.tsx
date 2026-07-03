@@ -1,16 +1,20 @@
-import { Text, View, StyleSheet, Image } from "react-native";
-
-const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+import { useEffect } from "react";
+import { Text, View, StyleSheet, Platform } from "react-native";
 
 export default function Index() {
-  console.log(EXPO_PUBLIC_BACKEND_URL, "EXPO_PUBLIC_BACKEND_URL");
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      window.location.replace("/webapp/index.html");
+    }
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require("../assets/images/app-image.png")}
-        style={styles.image}
-      />
+    <View style={styles.container} testID="webapp-redirect-screen">
+      <Text style={styles.title}>Asisten Petugas SE2026</Text>
+      <Text style={styles.subtitle}>
+        Aplikasi ini adalah web app (PWA). Silakan buka melalui browser di
+        alamat /webapp/index.html
+      </Text>
     </View>
   );
 }
@@ -18,13 +22,22 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0c0c0c",
+    backgroundColor: "#1d6b2e",
     alignItems: "center",
     justifyContent: "center",
+    padding: 24,
   },
-  image: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
+  title: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  subtitle: {
+    color: "#e6eee8",
+    fontSize: 14,
+    textAlign: "center",
+    lineHeight: 20,
   },
 });

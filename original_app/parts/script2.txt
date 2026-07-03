@@ -1,0 +1,57 @@
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// ===== PWA: INSTALL BANNER =====
+let deferredPrompt = null;
+const banner = document.getElementById('installBanner');
+const btnYes = document.getElementById('installYes');
+const btnNo  = document.getElementById('installNo');
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Tampilkan banner setelah 3 detik
+  setTimeout(() => {
+    if (deferredPrompt) banner.classList.add('visible');
+  }, 3000);
+});
+
+btnYes.addEventListener('click', async () => {
+  banner.classList.remove('visible');
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') showToast('✅ Aplikasi berhasil dipasang!');
+    deferredPrompt = null;
+  }
+});
+
+btnNo.addEventListener('click', () => {
+  banner.classList.remove('visible');
+  deferredPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  showToast('✅ SE2026 sudah terpasang!');
+  banner.classList.remove('visible');
+});
+
+// ===== OFFLINE DETECTOR =====
+const offlineBadge = document.getElementById('offlineBadge');
+
+function updateOnlineStatus() {
+  if (!navigator.onLine) {
+    offlineBadge.classList.add('show');
+  } else {
+    offlineBadge.classList.remove('show');
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();

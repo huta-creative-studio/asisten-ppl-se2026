@@ -1,0 +1,7 @@
+
+<script src="./js/vendor/html2canvas.min.js" defer></script>
+<script src="./js/app.min.js"></script>
+<script src="./js/lock.min.js"></script>
+<script src="./js/pwa.min.js"></script>
+</body>
+</html>

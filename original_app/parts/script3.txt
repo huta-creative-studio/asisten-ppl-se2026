@@ -1,0 +1,181 @@
+// ===== SISTEM AKTIVASI KODE (1 KODE = 1 PERANGKAT) =====
+// GANTI URL INI dengan URL Web App dari Google Apps Script Anda
+const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzUMVTcWHvlpRiWK7runS6kg0tZrdmEzLJvKjCgenKGm3pZkc4hbfaASmP-bd5tb3j6sw/exec';
+
+const LOCK_STORAGE_KEY = 'se2026_kode_aktif_v1';
+
+const lockScreen = document.getElementById('lockScreen');
+const lockBox    = document.getElementById('lockBox');
+const inputKode  = document.getElementById('kodeAkses');
+const lockMsg    = document.getElementById('lockMsg');
+const btnAktivasi = document.getElementById('btnAktivasi');
+
+// Cek apakah HP ini sudah pernah aktivasi sebelumnya
+// PATCH PERFORMA: jangan blocking-wait ke server saat startup (Apps Script sering
+// lambat 2-6 detik). Percaya localStorage dulu supaya app langsung terbuka,
+// lalu verifikasi ke server di BACKGROUND (non-blocking) dengan timeout singkat.
+// Kalau server bilang kode tidak valid -> baru dikunci ulang belakangan.
+(function initLock() {
+  const tersimpan = localStorage.getItem(LOCK_STORAGE_KEY);
+
+  if (!tersimpan) {
+    // Belum pernah aktivasi -> tampilkan lock screen
+    return;
+  }
+
+  // Sudah pernah aktivasi di HP ini -> langsung buka app tanpa menunggu server.
+  
+  lockScreen.classList.add('hidden');
+
+  // Offline -> cukup percaya localStorage, tidak perlu verifikasi ke server.
+  if (!navigator.onLine) return;
+
+   // Verifikasi ulang ke server di background (tidak menahan tampilan app).
+  verifikasiKodeBackground(tersimpan);
+})();
+
+async function verifikasiKodeBackground(tersimpan) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // max 5 detik nunggu server
+
+  try {
+    const device = encodeURIComponent(getDeviceFingerprint());
+    const url = `${URL_APPS_SCRIPT}?action=cek&kode=${encodeURIComponent(tersimpan)}&device=${device}`;
+    const res = await fetch(url, { signal: controller.signal });
+    const data = await res.json();
+
+    if (data.success && data.status === 'aktif') {
+      // Kode ini memang yang mengaktifkan -> tetap terbuka, tidak perlu apa-apa.
+      return;
+    }
+
+    // Status 'belum', 'aktif_beda_device', atau lainnya -> kode tidak valid lagi,
+    // kunci ulang aplikasi dan minta kode baru.
+    localStorage.removeItem(LOCK_STORAGE_KEY);
+    lockScreen.classList.remove('hidden');
+    showLockMsg('⚠️ Sesi aktivasi berakhir, silakan masukkan kode lagi.', 'error');
+  } catch (err) {
+    // Gagal/timeout menghubungi server -> tetap percaya localStorage,
+    // jangan kunci user yang sedang bekerja offline/koneksi lemah di lapangan.
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function showLockMsg(text, type) {
+  lockMsg.textContent = text;
+  lockMsg.className = 'lock-msg show ' + type;
+}
+
+function setLockLoading(loading) {
+  btnAktivasi.disabled = loading;
+  btnAktivasi.innerHTML = loading
+    ? '<span class="lock-spinner"></span>Memeriksa...'
+    : 'Buka Aplikasi';
+}
+
+function getDeviceFingerprint() {
+  // Info sederhana untuk catatan admin (bukan untuk keamanan ketat)
+  const ua = navigator.userAgent.substring(0, 80);
+  const screenInfo = `${window.screen.width}x${window.screen.height}`;
+  return `${ua} | ${screenInfo}`;
+}
+
+async function aktivasiKode() {
+  const kode = inputKode.value.trim().toUpperCase();
+
+  if (!kode) {
+    showLockMsg('⚠️ Masukkan kode akses terlebih dahulu.', 'error');
+    return;
+  }
+
+  if (URL_APPS_SCRIPT === 'GANTI_URL_APPS_SCRIPT') {
+    showLockMsg('⚠️ Sistem belum dikonfigurasi. Hubungi admin.', 'error');
+    return;
+  }
+
+  if (!navigator.onLine) {
+    showLockMsg('⚠️ Aktivasi pertama kali butuh koneksi internet. Sambungkan ke WiFi/data lalu coba lagi.', 'error');
+    return;
+  }
+
+  setLockLoading(true);
+  lockMsg.classList.remove('show');
+
+  try {
+    const device = encodeURIComponent(getDeviceFingerprint());
+    const url = `${URL_APPS_SCRIPT}?action=aktivasi&kode=${encodeURIComponent(kode)}&device=${device}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    setLockLoading(false);
+
+    if (data.success) {
+      localStorage.setItem(LOCK_STORAGE_KEY, kode);
+      showLockMsg('✅ Aktivasi berhasil! Membuka aplikasi...', 'info');
+      setTimeout(() => {
+        lockScreen.classList.add('hidden');
+      }, 800);
+    } else {
+      showLockMsg('⚠️ ' + (data.message || 'Kode tidak valid.'), 'error');
+      lockBox.style.animation = 'none';
+      setTimeout(() => { lockBox.style.animation = 'shake 0.3s'; }, 10);
+    }
+  } catch (err) {
+    setLockLoading(false);
+    showLockMsg('⚠️ Gagal menghubungi server. Periksa koneksi internet dan coba lagi.', 'error');
+  }
+}
+
+inputKode.addEventListener('keypress', e => { if (e.key === 'Enter') aktivasiKode(); });
+
+// ===== PROGRESSIVE WEB APP =====
+// Register service worker (offline support + cache)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('[PWA] SW registered:', reg.scope))
+      .catch(err => console.warn('[PWA] SW registration failed:', err));
+  });
+}
+
+/**
+ * PWA Install Banner (sinkronisasi dengan #installBanner)
+ * - Target: gunakan #installBanner
+ * - Tampilan: pakai class 'visible' (tanpa inline style)
+ */
+let _deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+
+  const bannerEl = document.getElementById('installBanner');
+  if (bannerEl) bannerEl.classList.add('visible');
+});
+
+window.installPWA = async function() {
+  if (!_deferredInstallPrompt) {
+    showToast('💡 Buka menu browser → "Add to Home Screen" / "Install App"');
+    return;
+  }
+
+  _deferredInstallPrompt.prompt();
+  const { outcome } = await _deferredInstallPrompt.userChoice;
+
+  if (outcome === 'accepted') {
+    showToast('✅ App terinstall di Home Screen!');
+  }
+
+  _deferredInstallPrompt = null;
+
+  const bannerEl = document.getElementById('installBanner');
+  if (bannerEl) bannerEl.classList.remove('visible');
+};
+
+// Sembunyikan banner install kalau sudah jalan sebagai PWA
+window.addEventListener('appinstalled', () => {
+  const bannerEl = document.getElementById('installBanner');
+  if (bannerEl) bannerEl.classList.remove('visible');
+  showToast('✅ Asisten SE2026 terpasang');
+});
