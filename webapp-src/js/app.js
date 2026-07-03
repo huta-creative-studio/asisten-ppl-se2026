@@ -3214,30 +3214,61 @@ function hitungBiayaUsaha(idx) {
   };
 }
 
-function salinBiayaUsaha(idx) {
+// Label kategori 26.b-26.e untuk fungsi salin terpisah
+const KATEGORI_LABEL_26 = {
+  b: '26.b Biaya Produksi',
+  c: '26.c Biaya Sewa & Jasa Lainnya',
+  d: '26.d Biaya Operasional',
+  e: '26.e Biaya Non-Operasional'
+};
+
+// Salin catatan Tenaga Kerja saja (jumlah karyawan, gaji, jamsos, THR + total 26.a)
+function salinTenagaKerja(idx) {
   idx = idx || 1;
-  try { if (typeof hitungBiayaUsaha === 'function') hitungBiayaUsaha(idx); } catch (e) {}
-  const h = window._lastBiayaUsaha;
-  if (!h || !h.total) { showToast('⚠️ Isi dulu rinciannya'); return; }
+  try { updateTkSummary(idx); } catch (e) {}
+  const n      = parseFloat((document.getElementById('jumlahKaryawan_' + idx) || {}).value || '0') || 0;
+  const gaji   = parseRp((document.getElementById('gajiPerOrang_' + idx)   || {}).value || '');
+  const jamsos = parseRp((document.getElementById('jamsosPerOrang_' + idx) || {}).value || '');
+  const thr    = parseRp((document.getElementById('thrPerOrang_' + idx)    || {}).value || '');
+  if (!n && !gaji && !jamsos && !thr) { showToast('⚠️ Isi data Tenaga Kerja dulu'); return; }
 
-  const rincian = (items) => items.filter(it => it.nilai > 0).map(it => `    ↳ ${it.nama}: ${formatRp(it.nilai)}\n`).join('');
+  const gajiTh   = gaji   * 12 * n;
+  const jamsosTh = jamsos * 12 * n;
+  const thrTh    = thr         * n;
+  const totalTh  = gajiTh + jamsosTh + thrTh;
 
-  const teks = `=== TENAGA KERJA & RINCIAN PENGELUARAN USAHA ${idx} (26.a-26.e) ===
-TENAGA KERJA
-  Jumlah Karyawan            : ${h.nKaryawan || 0} orang
-  Gaji / Orang / Bulan       : ${formatRp(h.gajiPerOrang || 0)}
-  Jaminan Sosial / Orang / Bulan : ${formatRp(h.jamsosPerOrang || 0)}
-  Bonus / THR / Orang / Tahun    : ${formatRp(h.thrPerOrang || 0)}
+  const teks = `=== TENAGA KERJA — USAHA ${idx} ===
+
+Jumlah Karyawan (selain pemilik) : ${n} orang
+Gaji / Orang / Bulan             : ${formatRp(gaji)}
+Jaminan Sosial / Orang / Bulan   : ${formatRp(jamsos)}
+Bonus / THR / Orang / Tahun      : ${formatRp(thr)}
 ------------------------------------
-26.a Upah, Gaji & Jaminan Sosial : ${formatRp(h.a)}
-${rincian(h.itemsA)}26.b Biaya Produksi              : ${formatRp(h.b)}
-${rincian(h.itemsB)}26.c Biaya Sewa & Jasa Lainnya    : ${formatRp(h.c)}
-${rincian(h.itemsC)}26.d Biaya Operasional            : ${formatRp(h.d)}
-${rincian(h.itemsD)}26.e Biaya Non-Operasional        : ${formatRp(h.e)}
-${rincian(h.itemsE)}------------------------------------
-26.f TOTAL PENGELUARAN             : ${formatRp(h.total)}
-(${terbilang(h.total)})
-======================================`;
+Total Gaji / Tahun          : ${formatRp(gajiTh)}
+Total Jaminan Sosial / Tahun: ${formatRp(jamsosTh)}
+Total Bonus/THR / Tahun     : ${formatRp(thrTh)}
+------------------------------------
+26.a TOTAL Upah, Gaji & Jaminan Sosial / Tahun : ${formatRp(totalTh)}
+====================================`;
+  copyToClipboard(teks);
+}
+
+// Salin catatan 1 kategori (26.b/c/d/e) saja — itemized + subtotal bulan & tahun
+function salinItemBiaya26(kategori, idx) {
+  idx = idx || 1;
+  const items = getItemsBiaya(kategori, idx).filter(it => it.nilai > 0);
+  if (!items.length) { showToast('⚠️ Belum ada item diisi'); return; }
+
+  const subtotalBulan = items.reduce((s, it) => s + it.nilai, 0);
+  const subtotalTahun = subtotalBulan * 12;
+  const label = KATEGORI_LABEL_26[kategori] || ('26.' + kategori);
+
+  let teks = `=== ${label.toUpperCase()} — USAHA ${idx} ===\n\n`;
+  items.forEach(it => teks += `${it.nama}: ${formatRp(it.nilai)} /bulan\n`);
+  teks += `\n------------------------------------\n`;
+  teks += `SUBTOTAL / BULAN : ${formatRp(subtotalBulan)}\n`;
+  teks += `SUBTOTAL / TAHUN : ${formatRp(subtotalTahun)}\n`;
+  teks += `====================================`;
   copyToClipboard(teks);
 }
 

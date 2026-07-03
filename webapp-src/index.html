@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Asisten Petugas SE2026</title>
 <meta name="description" content="Aplikasi usaha untuk pengisian FASIH BPS SE2026">
-<meta name="theme-color" content="#2b5fa8">
+<meta name="theme-color" content="#7c2334">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -293,6 +293,7 @@
       <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun_1">Rp 0</span></div>
       <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun_1">Rp 0</span></div>
     </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTenagaKerja(1)">📋 Salin Catatan Tenaga Kerja</button>
   </div>
 
   <!-- ========= RINCIAN 26 (b–e) — input lengkap pengeluaran usaha ========= -->
@@ -321,6 +322,7 @@
         <div class="hasil-label">Subtotal 26.b / Tahun</div>
         <div class="hasil-nilai" id="bu26b-subtotal_1" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('b',1)">📋 Salin Catatan 26.b</button>
     </div>
 
     <div class="field">
@@ -332,6 +334,7 @@
         <div class="hasil-label">Subtotal 26.c / Tahun</div>
         <div class="hasil-nilai" id="bu26c-subtotal_1" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('c',1)">📋 Salin Catatan 26.c</button>
     </div>
 
     <div class="field">
@@ -343,6 +346,7 @@
         <div class="hasil-label">Subtotal 26.d / Tahun</div>
         <div class="hasil-nilai" id="bu26d-subtotal_1" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('d',1)">📋 Salin Catatan 26.d</button>
     </div>
 
     <div class="field">
@@ -354,12 +358,11 @@
         <div class="hasil-label">Subtotal 26.e / Tahun</div>
         <div class="hasil-nilai" id="bu26e-subtotal_1" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('e',1)">📋 Salin Catatan 26.e</button>
     </div>
 
     <!-- Compat: bu26aList tidak dipakai (Tenaga Kerja menggantikan), tapi tetap ada agar JS legacy tidak error -->
     <div id="bu26aList_1" style="display:none"></div>
-
-    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(1)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(1)">🧮 HITUNG PENGHASILAN</button>
@@ -523,6 +526,7 @@
       <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun_2">Rp 0</span></div>
       <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun_2">Rp 0</span></div>
     </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTenagaKerja(2)">📋 Salin Catatan Tenaga Kerja</button>
   </div>
 
   <div class="card">
@@ -547,6 +551,7 @@
         <div class="hasil-label">Subtotal 26.b / Tahun</div>
         <div class="hasil-nilai" id="bu26b-subtotal_2" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('b',2)">📋 Salin Catatan 26.b</button>
     </div>
 
     <div class="field">
@@ -558,6 +563,7 @@
         <div class="hasil-label">Subtotal 26.c / Tahun</div>
         <div class="hasil-nilai" id="bu26c-subtotal_2" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('c',2)">📋 Salin Catatan 26.c</button>
     </div>
 
     <div class="field">
@@ -569,6 +575,7 @@
         <div class="hasil-label">Subtotal 26.d / Tahun</div>
         <div class="hasil-nilai" id="bu26d-subtotal_2" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('d',2)">📋 Salin Catatan 26.d</button>
     </div>
 
     <div class="field">
@@ -580,11 +587,10 @@
         <div class="hasil-label">Subtotal 26.e / Tahun</div>
         <div class="hasil-nilai" id="bu26e-subtotal_2" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('e',2)">📋 Salin Catatan 26.e</button>
     </div>
 
     <div id="bu26aList_2" style="display:none"></div>
-
-    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(2)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(2)">🧮 HITUNG PENGHASILAN</button>
@@ -747,6 +753,7 @@
       <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun_3">Rp 0</span></div>
       <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun_3">Rp 0</span></div>
     </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTenagaKerja(3)">📋 Salin Catatan Tenaga Kerja</button>
   </div>
 
   <div class="card">
@@ -771,6 +778,7 @@
         <div class="hasil-label">Subtotal 26.b / Tahun</div>
         <div class="hasil-nilai" id="bu26b-subtotal_3" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('b',3)">📋 Salin Catatan 26.b</button>
     </div>
 
     <div class="field">
@@ -782,6 +790,7 @@
         <div class="hasil-label">Subtotal 26.c / Tahun</div>
         <div class="hasil-nilai" id="bu26c-subtotal_3" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('c',3)">📋 Salin Catatan 26.c</button>
     </div>
 
     <div class="field">
@@ -793,6 +802,7 @@
         <div class="hasil-label">Subtotal 26.d / Tahun</div>
         <div class="hasil-nilai" id="bu26d-subtotal_3" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('d',3)">📋 Salin Catatan 26.d</button>
     </div>
 
     <div class="field">
@@ -804,11 +814,10 @@
         <div class="hasil-label">Subtotal 26.e / Tahun</div>
         <div class="hasil-nilai" id="bu26e-subtotal_3" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('e',3)">📋 Salin Catatan 26.e</button>
     </div>
 
     <div id="bu26aList_3" style="display:none"></div>
-
-    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(3)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(3)">🧮 HITUNG PENGHASILAN</button>
@@ -971,6 +980,7 @@
       <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun_4">Rp 0</span></div>
       <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun_4">Rp 0</span></div>
     </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTenagaKerja(4)">📋 Salin Catatan Tenaga Kerja</button>
   </div>
 
   <div class="card">
@@ -995,6 +1005,7 @@
         <div class="hasil-label">Subtotal 26.b / Tahun</div>
         <div class="hasil-nilai" id="bu26b-subtotal_4" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('b',4)">📋 Salin Catatan 26.b</button>
     </div>
 
     <div class="field">
@@ -1006,6 +1017,7 @@
         <div class="hasil-label">Subtotal 26.c / Tahun</div>
         <div class="hasil-nilai" id="bu26c-subtotal_4" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('c',4)">📋 Salin Catatan 26.c</button>
     </div>
 
     <div class="field">
@@ -1017,6 +1029,7 @@
         <div class="hasil-label">Subtotal 26.d / Tahun</div>
         <div class="hasil-nilai" id="bu26d-subtotal_4" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('d',4)">📋 Salin Catatan 26.d</button>
     </div>
 
     <div class="field">
@@ -1028,11 +1041,10 @@
         <div class="hasil-label">Subtotal 26.e / Tahun</div>
         <div class="hasil-nilai" id="bu26e-subtotal_4" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('e',4)">📋 Salin Catatan 26.e</button>
     </div>
 
     <div id="bu26aList_4" style="display:none"></div>
-
-    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(4)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(4)">🧮 HITUNG PENGHASILAN</button>
@@ -1195,6 +1207,7 @@
       <div class="tk-row"><span>Bonus / THR (× jumlah)</span><span class="tk-val" id="tkThrTahun_5">Rp 0</span></div>
       <div class="tk-row total"><span>Total Biaya Tenaga Kerja / Tahun</span><span class="tk-val" id="tkTotalTahun_5">Rp 0</span></div>
     </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="salinTenagaKerja(5)">📋 Salin Catatan Tenaga Kerja</button>
   </div>
 
   <div class="card">
@@ -1219,6 +1232,7 @@
         <div class="hasil-label">Subtotal 26.b / Tahun</div>
         <div class="hasil-nilai" id="bu26b-subtotal_5" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('b',5)">📋 Salin Catatan 26.b</button>
     </div>
 
     <div class="field">
@@ -1230,6 +1244,7 @@
         <div class="hasil-label">Subtotal 26.c / Tahun</div>
         <div class="hasil-nilai" id="bu26c-subtotal_5" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('c',5)">📋 Salin Catatan 26.c</button>
     </div>
 
     <div class="field">
@@ -1241,6 +1256,7 @@
         <div class="hasil-label">Subtotal 26.d / Tahun</div>
         <div class="hasil-nilai" id="bu26d-subtotal_5" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('d',5)">📋 Salin Catatan 26.d</button>
     </div>
 
     <div class="field">
@@ -1252,11 +1268,11 @@
         <div class="hasil-label">Subtotal 26.e / Tahun</div>
         <div class="hasil-nilai" id="bu26e-subtotal_5" style="font-size:16px">Rp 0</div>
       </div>
+      <button class="copy-btn" style="margin-top:10px" onclick="salinItemBiaya26('e',5)">📋 Salin Catatan 26.e</button>
     </div>
 
     <div id="bu26aList_5" style="display:none"></div>
 
-    <button class="copy-btn" style="margin-top:14px" onclick="salinBiayaUsaha(5)">📋 Salin Catatan (Tenaga Kerja &amp; 26.b-e)</button>
   </div>
 
   <button class="hitung-btn" onclick="hitung(5)">🧮 HITUNG PENGHASILAN</button>
