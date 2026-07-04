@@ -65,7 +65,7 @@ cp "$SRC/icons/"*.png "$DIST/icons/"
 echo "== Minify HTML =="
 npx --yes html-minifier-terser "$SRC/index.html" \
   --collapse-whitespace --remove-comments \
-  --remove-redundant-attributes --remove-script-type-attributes \
+  --remove-script-type-attributes \
   --use-short-doctype \
   -o "$DIST/index.html"
 
