@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Ganti dengan nama branch utama Anda jika bukan main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2 # Menggunakan rilis v4 terbaru
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5 # Diperbarui ke v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3.0.1 # Menggunakan rilis v3 terbaru
+        # Bagian ini menentukan folder mana yang akan di-deploy sebagai root
+        with:
+          path: './frontend/public/webapp/'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4.0.5 # Menggunakan rilis v4 terbaru
