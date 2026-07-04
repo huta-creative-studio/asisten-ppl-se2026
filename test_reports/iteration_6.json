@@ -1,0 +1,43 @@
+{
+  "summary": "Frontend-only visual verification of the 'box in box' input CSS fix. Unlocked app via localStorage bypass (AGEN-2026 and fallback codes AGEN-1/2/3 all failed as expected in sandbox since google Apps Script is blocked/unreachable). Confirmed the AT-REST (unfocused) input styling fix works well - Nama Keluarga and Omzet fields now show a clean single soft-gray rounded pill with the Rp badge blending smoothly, no harsh divider. HOWEVER, the FOCUS state still shows a visible 'box within a box' - a black rectangular native browser focus outline renders INSIDE the pink rounded input-wrap border. Root cause: getComputedStyle confirms `appearance` stays 'auto', `border-style` stays 'inset' (2px, browser UA default), and `outline-style` becomes 'auto' (native focus ring) on the actual <input> elements when focused - meaning the author CSS rule (border:none; appearance:none; outline:none) is present in the matched CSSOM rule but is NOT winning the cascade against the browser's native form-control UA styles for this Chromium version. Verified by force-setting the same properties inline with !important via JS, which immediately fixed the appearance (border disappeared, seamless pill) - proving the fix needs !important or stronger reset (also add explicit longhand border-width/style/color + outline-style:none + -webkit-appearance on :focus and :focus-visible states) to reliably suppress native mobile browser input chrome. This reproduces identically on Nama Keluarga (Responden tab) and Omzet (Usaha 1 tab) since both share the same .input-wrap / rp-input CSS rule, so Gaji/Jaminan Sosial/Bonus-THR and other tabs (Belanja RT, Pendapatan, Nilai Aset) will show the same focus-state regression since they reuse the identical shared class.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "input[type=text]/input[type=number] inside .input-wrap (e.g. #namaResponden, .rp-input like #omzet_1)",
+        "issue": "On FOCUS, the native browser default input appearance (2px inset border + black 'auto' focus outline ring) still renders on top of/inside the custom pink-bordered .input-wrap pill, recreating the reported 'box inside a box' (nested rectangle) effect. Confirmed via getComputedStyle: appearance='auto', border-style='inset', outline-style='auto' despite CSS declaring appearance:none/border:none/outline:none for this selector (rule is present and matches in CSSOM, but loses the cascade against Chromium's native form-control UA styling for focused inputs). At-rest (unfocused) state looks correctly fixed - single clean soft-gray pill.",
+        "testID": "namaResponden, omzet_1 (no testID attrs present, used id selectors)",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Responden tab / Usaha 1 tab (shared .input-wrap component used across all tabs)",
+        "issues": [
+          "Focus state of any text/number input still shows double-border 'box in box' visual - the exact bug the user reported is only PARTIALLY fixed (fixed at rest, NOT fixed on focus/tap, which is one of the 4 scenarios explicitly requested for verification)."
+        ]
+      }
+    ],
+    "react_native_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Strengthen the CSS reset on input[type=number], input[type=text], select to reliably beat native UA focus/appearance styling: add `!important` to appearance/-webkit-appearance/border/outline declarations, OR add explicit longhand resets (border-width:0; border-style:none; outline-style:none) AND add a dedicated `:focus` / `:focus-visible` rule on the input itself (not just .input-wrap:focus-within) forcing outline:none !important and border:none !important, since the browser applies its native 'auto' outline specifically on focus.",
+    "After the fix, re-verify focus state screenshot shows NO visible black rectangular ring/border inside the .input-wrap pill on Nama Keluarga, Omzet, Gaji, Jaminan Sosial, Bonus/THR fields.",
+    "Rebuild via /app/webapp-src/build.sh after CSS edit and confirm styles.min.css in /app/frontend/public/webapp reflects the change."
+  ],
+  "critical_code_review_comments": [
+    "input-wrap:focus-within relies on the child <input>'s own outline:none/border:none/appearance:none to stay invisible, but those declarations on the plain type-selector rule are apparently insufficient to override Chromium's native focused-control rendering in this environment - needs !important or a more explicit :focus rule for robustness across browser engines (this matters a lot for the target mobile/Android WebView audience of BPS enumerators)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A - frontend only", "frontend": "50% - at-rest fix confirmed working, focus-state fix NOT working (regression of the reported bug still present)"},
+  "seed_data_creation": "None - only in-memory form fill for screenshot verification, no persistent data created.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Use localStorage bypass (block **script.google.com**, set localStorage se2026_kode_aktif_v1 to any string, reload) - AGEN-2026 and fallback codes do NOT work in this sandbox since the Apps Script backend is unreachable/blocked, this is expected and not an app bug. To inspect focus-state CSS bug: page.evaluate getComputedStyle(inputEl) after el.click(force=True) or el.focus(); check appearance/border-style/outline-style - should all be 'none' but currently show 'auto'/'inset'/'auto' respectively.",
+  "rca_of_issue": "The .input-wrap container fix (soft gray bg, invisible border matching bg) is correctly implemented and deployed (verified in built styles.min.css) and works visually at rest. But the underlying <input> element's own native browser chrome (default 2px inset border + focus-visible outline ring) is not being fully suppressed by the plain (non-!important) `border: none; outline: none; appearance: none;` declarations in this Chromium version when the element is :focus'd - reproduced consistently via automated click+focus and confirmed via getComputedStyle. Forcing the same properties with inline style + !important immediately resolved it, confirming the fix (i.e., !important or stronger/more specific selector, e.g. targeting :focus explicitly) is what's missing, not a fundamentally wrong CSS approach."
+}
