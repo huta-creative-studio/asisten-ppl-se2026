@@ -180,33 +180,36 @@
     flex-shrink: 0;
   }
 
-  .field { margin-bottom: 14px; }
+  .field { margin-bottom: 16px; }
   .field:last-child { margin-bottom: 0; }
   label {
     display: block;
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--muted);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
   }
   .input-wrap {
     display: flex;
-    align-items: center;
-    background: var(--bg);
+    align-items: stretch;
+    background: var(--card);
     border: 1.5px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .input-wrap:focus-within { border-color: var(--bps-light); }
+  .input-wrap:focus-within {
+    border-color: var(--bps-light);
+    box-shadow: 0 0 0 3px rgba(124,35,52,0.10);
+  }
   .input-prefix {
-    padding: 0 10px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--muted);
-    background: var(--border);
+    padding: 0 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--bps-blue);
+    background: var(--blue-bg);
     align-self: stretch;
     display: flex;
     align-items: center;
@@ -217,19 +220,22 @@
     flex: 1;
     border: none;
     background: transparent;
-    padding: 10px 12px;
-    font-family: 'Roboto Mono', 'Courier New', monospace;
-    font-size: 14px;
+    padding: 12px 14px;
+    font-family: var(--font-ui);
+    font-size: 14.5px;
     color: var(--text);
     outline: none;
     width: 100%;
     min-width: 0;
   }
   input.rp-input {
+    font-family: var(--font-mono);
     font-weight: 700;
     font-size: 16px;
-    color: var(--bps-blue);
+    color: var(--text);
+    letter-spacing: 0.2px;
   }
+  input.rp-input:focus { color: var(--bps-blue); }
   select { font-family: 'Google Sans', 'Roboto', system-ui, sans-serif; font-size: 13px; }
   .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
