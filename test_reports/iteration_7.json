@@ -1,0 +1,45 @@
+{
+  "summary": "Re-verified the 'box in box' focus-state fix requested this round. BUG STILL PRESENT for the exact fields flagged: Nama Keluarga, Omzet, Gaji/Jamsos/THR. The new CSS !important focus rules were correctly added to styles.css AND correctly built into styles.min.css, but they NEVER MATCH these specific inputs because those inputs are missing the type attribute in the HTML markup (no type=\"text\" attribute present at all - typeAttr returns null via getAttribute, only the DOM property .type defaults to 'text'). CSS attribute selectors like input[type=\"text\"] only match elements that have that attribute explicitly set in HTML; they do NOT match elements that merely default to that type via the DOM. So none of the .css rules targeting input[type=\"text\"] (including the base reset AND the new :focus/:focus-visible !important fix) ever apply to namaResponden, omzet_1, gajiPerOrang_1, jamsosPerOrang_1, thrPerOrang_1 - these render with 100% native, unstyled browser input chrome (native grey inset border at rest, native black auto-outline + inset border on focus), which is the visible box-in-box artifact.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "input#namaResponden (Nama Keluarga / Nama Rumah Tangga, Responden tab)",
+        "issue": "Input element has NO type attribute in HTML (getAttribute('type') === null). CSS rules 'input[type=\"text\"]:focus, input[type=\"text\"]:focus-visible { border:none!important; outline:none!important; ... }' never match this element because attribute selectors require the literal attribute in markup. On focus: computed borderStyle='inset', outlineStyle='auto', outlineWidth='1px', appearance='auto' -> visible native black focus ring/box INSIDE the custom pink input-wrap border = box-in-box bug NOT fixed.",
+        "testID": "namaResponden",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "input#omzet_1 (Omzet / Penjualan Kotor, Usaha 1 tab)",
+        "issue": "Same root cause: no type attribute (relies only on inputmode=\"numeric\"), so input[type=\"text\"] focus-fix CSS does not apply. Native focus outline/inset border still renders.",
+        "testID": "omzet_1",
+        "priority": "CRITICAL"
+      },
+      {
+        "component": "input#gajiPerOrang_1, input#jamsosPerOrang_1, input#thrPerOrang_1 (Tenaga Kerja card, Usaha 1)",
+        "issue": "Same root cause as above - all three lack type attribute entirely. Native focus box-in-box persists identically.",
+        "testID": "gajiPerOrang_1 / jamsosPerOrang_1 / thrPerOrang_1",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [{"screen": "Responden / Usaha tabs", "issues": ["Box-in-box visual artifact remains on focus for all class=\"rp-input\" fields and namaResponden - confirmed both via screenshot and getComputedStyle"]}],
+    "react_native_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Root cause is HTML markup, not CSS: add explicit type=\"text\" attribute to <input id=\"namaResponden\"> and to all rp-input fields (omzet_1..N, gajiPerOrang_1..N, jamsosPerOrang_1..N, thrPerOrang_1..N, and any other input relying only on inputmode without an explicit type attribute) in /app/webapp-src (source html/js that generates these, likely index.html template and any JS templates that render Usaha 2-5 dynamically) so the existing CSS attribute-selector rules (base reset + new :focus/:focus-visible !important fix) actually match.",
+    "Alternative/more robust fix: change the CSS selectors to not depend on the type attribute at all, e.g. use a class-based selector (already have class=\"rp-input\" on money fields) or a universal 'input:not([type=checkbox]):not([type=radio])' selector for border/outline/appearance/focus rules, so future inputs added without explicit type attributes are covered automatically.",
+    "After fix, rebuild via `bash /app/webapp-src/build.sh` and re-run this exact getComputedStyle check (borderStyle should NOT be 'inset', outlineStyle should NOT be 'auto', appearance should NOT be 'auto' while :focus) before closing this bug."
+  ],
+  "critical_code_review_comments": [
+    "CSS fix in /app/webapp-src/css/styles.css lines 219-244 is syntactically correct and was correctly minified into build output, but is inert for several key inputs due to a markup gap - always verify attribute-selector CSS against actual rendered DOM attributes, not just DOM .type property, when writing input[type=...] selectors."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A", "frontend": "0% - focus-state fix not effective for any of the 3 flagged field groups"},
+  "seed_data_creation": "None - used documented localStorage bypass (se2026_kode_aktif_v1=TEST) after blocking script.google.com requests, per instructions",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bypass method confirmed working again this round: page.route block on **script.google.com** + localStorage.setItem('se2026_kode_aktif_v1','TEST') + reload. Use getComputedStyle(el) on focused input to check borderStyle/outlineStyle/appearance - this is the fastest way to verify the fix without relying on visual screenshots. Note the Usaha tab content did not render visibly in one test attempt (blank white area) until a jenis usaha/jumlahUsaha selection flow was completed on Responden tab first - not investigated further as out of scope, but worth noting for next round if Usaha tab appears empty.",
+  "rca_of_issue": "RCA: The developer added `input[type=\"number\"]:focus, input[type=\"text\"]:focus, select:focus, input[type=\"number\"]:focus-visible, input[type=\"text\"]:focus-visible, select:focus-visible { border:none!important; outline:none!important; ... }` to suppress native focus chrome. This is a valid CSS approach in principle. However several <input> elements in the app markup (namaResponden, and all 'rp-input' money fields: omzet_N, gajiPerOrang_N, jamsosPerOrang_N, thrPerOrang_N) are declared WITHOUT any type attribute at all in the HTML (confirmed via el.getAttribute('type') === null), relying only on inputmode=\"numeric\" or no type hint. Per CSS spec, attribute selectors [type=\"text\"] only match elements where that attribute is explicitly present in the DOM tree - they do not match based on the resolved/default IDL attribute value (even though el.type reads back 'text' by default). Therefore the ENTIRE input[type=\"text\"] rule block (both the original base reset at rest AND the new focus-fix) silently fails to apply to these specific inputs, leaving 100% default browser UA styling active: grey inset border at rest, and black auto outline + inset border insertion on :focus - reproducing the exact box-in-box bug the fix was meant to resolve. Verified via getComputedStyle: borderStyle='inset', outlineStyle='auto', outlineWidth='1px', appearance='auto' while focused, unchanged while typing."
+}
