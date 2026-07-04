@@ -202,7 +202,7 @@
   }
   .input-wrap:focus-within {
     border-color: var(--bps-light);
-    box-shadow: 0 0 0 3px rgba(124,35,52,0.10);
+    box-shadow: 0 0 0 3px rgba(124,35,52,0.18);
   }
   .input-prefix {
     padding: 0 12px;

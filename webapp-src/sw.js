@@ -4,7 +4,7 @@
 // dan BYPASS total untuk request ke Apps Script (aktivasi kode) — itu harus
 // selalu real-time ke server, tidak boleh di-cache.
 
-const CACHE_VERSION = 'se2026-v4';
+const CACHE_VERSION = 'se2026-v5';
 const PRECACHE_URLS = [
   './',
   './index.html',
