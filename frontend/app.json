@@ -39,11 +39,7 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "expo": {
-    "name": "asisten-se2026",
-    "experiments": {
-      "baseUrl": "/asisten-se2026"
+    }
     }
   }
 }
