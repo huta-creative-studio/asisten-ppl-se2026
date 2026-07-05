@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3.0.1 # Menggunakan rilis v3 terbaru
         # Bagian ini menentukan folder mana yang akan di-deploy sebagai root
         with:
-          path: './frontend/dist'
+          path: './frontend/public/webapp'
           
       - name: Deploy to GitHub Pages
         id: deployment
