@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # Ganti dengan nama branch utama Anda jika bukan main
+      - main 
 
 permissions:
   contents: read
@@ -22,23 +22,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 # Menggunakan rilis v4 terbaru 4.2.2
+        uses: actions/checkout@v6 
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5 # Diperbarui ke v5
+        uses: actions/configure-pages@v5 
 
-      - name: Install Dependencies and Build
-        run: |
-          cd frontend
-          npm install
-          npm run build # pastikan output-nya mengarah ke folder yang akan di-upload
-          
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3.0.1 # Menggunakan rilis v3 terbaru
-        # Bagian ini menentukan folder mana yang akan di-deploy sebagai root
+        uses: actions/upload-pages-artifact@v3.0.1 
         with:
-          path: './frontend/public/webapp'
-          
+          # Pastikan menunjuk langsung ke folder webapp milikmu
+          path: './frontend/public/webapp' 
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.5 # Menggunakan rilis v4 terbaru
+        uses: actions/deploy-pages@v4.0.5
