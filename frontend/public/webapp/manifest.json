@@ -1,5 +1,5 @@
 {
-  "name": "MITRA BPS SE2026",
+  "name": "MITRA BPS",
   "short_name": "SE2026",
   "description": "ASISTEN PPL MITRA BPS SE2026",
   "start_url": "./index.html",
@@ -7,7 +7,7 @@
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6f5f5",
-  "theme_color": "#7c2334",
+  "theme_color": "#800000",
   "orientation": "portrait-primary",
   "lang": "id",
   "icons": [
