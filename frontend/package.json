@@ -11,8 +11,6 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "build":"expo lint",
-    "dev": "vite",
-    "build": "vite build"
   },
   "dependencies": {
     "@expo/metro-runtime": "6.1.2",
