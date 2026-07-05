@@ -9,7 +9,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "dev": "vite",
+    "build": "vite build"
   },
   "dependencies": {
     "@expo/metro-runtime": "6.1.2",
