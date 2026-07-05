@@ -1,7 +1,7 @@
 {
-  "name": "Asisten Petugas SE2026",
+  "name": "MITRA BPS SE2026",
   "short_name": "SE2026",
-  "description": "Aplikasi usaha untuk pengisian FASIH BPS SE2026",
+  "description": "ASISTEN PPL MITRA BPS SE2026",
   "start_url": "./index.html",
   "id": "./index.html",
   "scope": "./",
