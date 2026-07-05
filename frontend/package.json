@@ -10,6 +10,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "build":"expo lint",
     "dev": "vite",
     "build": "vite build"
   },
