@@ -5,12 +5,16 @@
   "scripts": {
     "preinstall": "./scripts/cmd-guard.js --preinstall",
     "start": "expo start",
+    "start:web": "expo start --web",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "build":"npx expo export"
+    "build": "npx expo export",
+    "build:web": "EXPO_OS=web npx expo export --platform web",
+    "build:web:prod": "NODE_ENV=production EXPO_OS=web npx expo export --platform web",
+    "analyze": "webpack-bundle-analyzer dist/bundles/web/bundle.js"
   },
   "dependencies": {
     "@expo/metro-runtime": "6.1.2",
@@ -50,7 +54,8 @@
     "eslint": "9.25.0",
     "eslint-config-expo": "10.0.0",
     "expo-doctor": "1.19.8",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "webpack-bundle-analyzer": "^4.9.0"
   },
   "resolutions": {
     "@eslint/plugin-kit": "0.3.4",
