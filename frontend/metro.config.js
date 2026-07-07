@@ -11,15 +11,37 @@ config.cacheStores = [
   new FileStore({ root: path.join(root, 'cache') }),
 ];
 
+// Optimize for web builds
+if (process.env.EXPO_OS === 'web') {
+  // Enable minification
+  config.transformer.minifierConfig = {
+    compress: {
+      drop_console: true, // Remove console.logs in production
+      unsafe_methods: true,
+    },
+    mangle: true,
+    output: {
+      comments: false, // Remove comments to reduce bundle size
+    },
+  };
 
-// // Exclude unnecessary directories from file watching
-// config.watchFolders = [__dirname];
-// config.resolver.blacklistRE = /(.*)\/(__tests__|android|ios|build|dist|.git|node_modules\/.*\/android|node_modules\/.*\/ios|node_modules\/.*\/windows|node_modules\/.*\/macos)(\/.*)?$/;
+  // Web-specific optimizations
+  config.transformer.getTransformOptions = () => ({
+    transform: {
+      experimentalImportSupport: false,
+      inlineRequires: true, // Inline require statements for better tree-shaking
+    },
+  });
+}
 
-// // Alternative: use a more aggressive exclusion pattern
-// config.resolver.blacklistRE = /node_modules\/.*\/(android|ios|windows|macos|__tests__|\.git|.*\.android\.js|.*\.ios\.js)$/;
+// Exclude unnecessary directories from Metro watching
+config.watchFolders = [__dirname];
+config.resolver.blacklistRE = /(.*)\/(__tests__|\.git|node_modules\/.*\/(android|ios|windows|macos))(\/.*)?$/;
 
 // Reduce the number of workers to decrease resource usage
 config.maxWorkers = 2;
+
+// Cache strategy optimization
+config.cacheVersion = '1.0.0';
 
 module.exports = config;
