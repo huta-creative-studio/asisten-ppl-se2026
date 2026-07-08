@@ -19,7 +19,7 @@
 // Request ?action=aktivasi (submit kode BARU oleh user) TIDAK PERNAH
 // di-cache — selalu 100% real-time ke server, sesuai perilaku semula.
 
-const CACHE_VERSION = 'se2026-v12';
+const CACHE_VERSION = 'se2026-v11';
 const LICENSE_CACHE = 'se2026-license-cache-v1';
 const LICENSE_TTL_MS = 6 * 60 * 60 * 1000; // 6 jam — ubah sesuai kebutuhan
 
@@ -134,7 +134,14 @@ self.addEventListener('fetch', (event) => {
       const backgroundUpdate = fetchWithTimeout(req, NETWORK_TIMEOUT_MS)
         .then((res) => {
           if (res && res.status === 200) {
-            caches.open(CACHE_VERSION).then((cache) => cache.put(req, res.clone()));
+            // PATCH: clone() HARUS dipanggil sinkron di sini, sebelum
+            // body sempat "dipakai" oleh siapa pun (mis. browser yang
+            // langsung eksekusi script dari `res` yang di-return di
+            // bawah). Kalau clone() ditunda di dalam .then() lain,
+            // browser bisa keburu baca body duluan -> error
+            // "Response body is already used".
+            const resToCache = res.clone();
+            caches.open(CACHE_VERSION).then((cache) => cache.put(req, resToCache));
           }
           return res;
         })
