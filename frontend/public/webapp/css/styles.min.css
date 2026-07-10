@@ -2,7 +2,7 @@
 .lock-box input.text-normal{text-transform:none;letter-spacing:.3px;font-family:'Google Sans','Roboto','Segoe UI',system-ui,-apple-system,sans-serif;text-align:left}
 .device-id-box{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:left}
 .device-id-box label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
-.device-id-box .device-id-value{font-family:'Roboto Mono','Courier New',monospace;font-size:12px;color:var(--accent);word-break:break-all;margin-bottom:8px}
+.device-id-box .device-id-value{font-family:'Roboto Mono','Courier New',monospace;font-size:12px;color:var(--accent);word-break:break-all;margin-bottom:8px;text-transform:uppercase}
 .device-id-box button{width:100%;padding:9px;background:var(--card);color:var(--text);border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer}
 .lock-box .field-label{display:block;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;margin-top:2px}
 .lock-status-row{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
