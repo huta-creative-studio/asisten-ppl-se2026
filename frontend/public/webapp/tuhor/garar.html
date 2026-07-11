@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Terima Kasih - Mitra BPS SE2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #1a0a0a;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .card {
+    background: #2a1414;
+    border: 1px solid #5c1a1a;
+    border-radius: 16px;
+    padding: 36px 28px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+  }
+  .icon { font-size: 48px; margin-bottom: 12px; }
+  h1 { font-size: 22px; color: #ffb199; margin: 0 0 8px; }
+  p { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: #25D366;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+  }
+  .btn-wa:hover { background: #1fb855; }
+  .steps {
+    text-align: left;
+    background: #1a0a0a;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #bbb;
+  }
+  .steps li { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="icon">✅</div>
+  <h1>Pembayaran Diterima!</h1>
+  <p>Terima kasih sudah membeli akses <strong>Mitra BPS - Asisten Petugas Pencacah Lapangan SE2026</strong>. Isi data di bawah ini untuk lanjut konfirmasi ke admin.</p>
+
+  <div style="text-align:left; margin-bottom: 16px;">
+    <label style="font-size:13px; color:#ccc; display:block; margin-bottom:6px;">Nama</label>
+    <input type="text" id="namaInput" placeholder="Masukkan nama Anda" style="width:100%; padding:12px; border-radius:10px; border:1px solid #5c1a1a; background:#1a0a0a; color:#fff; font-size:14px; margin-bottom:14px;">
+
+    <label style="font-size:13px; color:#ccc; display:block; margin-bottom:6px;">No. Pesanan (TRX ID)</label>
+    <input type="text" id="trxInput" placeholder="Masukkan TRX ID" style="width:100%; padding:12px; border-radius:10px; border:1px solid #5c1a1a; background:#1a0a0a; color:#fff; font-size:14px; margin-bottom:6px;">
+    <p style="font-size:12px; color:#888; margin-top:0; margin-bottom:14px;">TRX ID bisa dilihat pada menu Transaction di Lynk.id</p>
+  </div>
+
+  <a class="btn-wa" id="linkWA" href="#" target="_blank" onclick="return validasiForm()">
+    💬 Konfirmasi via WhatsApp
+  </a>
+  <div id="errorMsg" style="color:#ff8080; font-size:13px; margin-top:10px;"></div>
+
+  <div class="steps">
+    <strong>Langkah selanjutnya:</strong>
+    <ol>
+      <li>Isi Nama & No. Pesanan (TRX ID) di atas</li>
+      <li>Klik tombol "Konfirmasi via WhatsApp"</li>
+      <li>Kirim pesan yang sudah otomatis terisi</li>
+      <li>Admin akan verifikasi & kirim kode aktivasi dalam waktu singkat</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+  const nomorAdmin = "6281264466958";
+
+  function validasiForm() {
+    const nama = document.getElementById('namaInput').value.trim();
+    const trx = document.getElementById('trxInput').value.trim();
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.innerText = "";
+
+    if (!nama || !trx) {
+      errorMsg.innerText = "Mohon isi Nama dan No. Pesanan (TRX ID) terlebih dahulu.";
+      return false;
+    }
+
+    const pesan = `Halo Admin, saya sudah melakukan pembayaran untuk Mitra BPS - Asisten Petugas Pencacah Lapangan SE2026 di Lynk.id.
+
+Nama: ${nama}
+No. Pesanan (TRX ID): ${trx}
+
+Mohon dikonfirmasi dan dikirimkan kode aktivasinya. Terima kasih!`;
+
+    const link = `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`;
+    document.getElementById('linkWA').href = link;
+    return true;
+  }
+</script>
+
+</body>
+</html>
