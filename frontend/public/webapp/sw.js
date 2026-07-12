@@ -19,7 +19,7 @@
 // Request ?action=aktivasi (submit kode BARU oleh user) TIDAK PERNAH
 // di-cache — selalu 100% real-time ke server, sesuai perilaku semula.
 
-const CACHE_VERSION = 'se2026-v16';
+const CACHE_VERSION = 'se2026-v17';
 const LICENSE_CACHE = 'se2026-license-cache-v1';
 const LICENSE_TTL_MS = 6 * 60 * 60 * 1000; // 6 jam — ubah sesuai kebutuhan
 
