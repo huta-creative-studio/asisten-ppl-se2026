@@ -19,23 +19,26 @@
 // Request ?action=aktivasi (submit kode BARU oleh user) TIDAK PERNAH
 // di-cache — selalu 100% real-time ke server, sesuai perilaku semula.
 
-const CACHE_VERSION = 'se2026-v19';
+const CACHE_VERSION = 'se2026-v22';
 const LICENSE_CACHE = 'se2026-license-cache-v1';
 const LICENSE_TTL_MS = 6 * 60 * 60 * 1000; // 6 jam — ubah sesuai kebutuhan
 
 const PRECACHE_URLS = [
   './',
   './index.html',
+  './assistencalc.html',
   './manifest.json',
   './css/styles.min.css',
   './js/app.min.js',
-  './js/lock.min.js',
+  './js/auth.min.js',
   './js/pwa.min.js',
   './js/lazy-html2canvas.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png'
 ];
+// SENGAJA TIDAK di-precache (harus online, tidak untuk dipakai offline):
+// rootadmin.html, ocrkkktp.html, admin-generate.html, js/ocr-kk-ktp.min.js
 
 const NETWORK_TIMEOUT_MS = 4000;
 
