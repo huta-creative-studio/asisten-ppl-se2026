@@ -1,0 +1,23 @@
+<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Panel Admin - Asisten SE2026</title><meta name="robots" content="noindex,nofollow"><link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png"><link rel="stylesheet" href="./css/styles.min.css"></head><body>
+<div style="min-height:100vh;background:linear-gradient(135deg,var(--bps-blue) 0,#2a0f16 100%);display:flex;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--card);border:1px solid var(--copper);border-radius:16px;padding:26px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="text-align:center;font-size:36px;margin-bottom:8px">🔐</div>
+    <h2 style="margin:0 0 4px;font-size:18px;text-align:center;color:var(--label-gold)">Panel Admin</h2>
+    <p style="text-align:center;font-size:12.5px;color:var(--muted);margin:0 0 20px">Login sebagai <b id="namaUserAktif" style="color:var(--text)">Admin</b> — pilih halaman yang ingin dibuka</p>
+
+    <div data-need-online>
+      <button onclick="location.href='./assistencalc.html'" style="width:100%;padding:15px;margin-bottom:10px;background:linear-gradient(160deg,var(--bps-blue) 0%,#3d0000 100%);color:#f3e9de;border:1px solid rgba(201,138,75,.35);border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🧮</span><span>Buka Asisten Petugas Pencacah Lapangan SE2026</span></button>
+      <button onclick="window.open('./admin-generate.html','_blank')" style="width:100%;padding:15px;margin-bottom:10px;background:var(--btn2-bg);color:var(--btn2-text);border:1px solid var(--btn2-border);border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🔑</span><span>Buka Halaman Generator Kode Aktivasi</span></button>
+      <button onclick="location.href='./ocrkkktp.html'" style="width:100%;padding:15px;background:var(--btn2-bg);color:var(--btn2-text);border:1px solid var(--btn2-border);border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-align:left;display:flex;align-items:center;gap:10px"><span style="font-size:20px">🪪</span><span>Buka Halaman Scan KK / KTP</span></button>
+    </div>
+
+    <div id="needOnlineMsg" style="display:none;font-size:13px;line-height:1.6;color:var(--text);background:var(--red-bg);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px;margin-bottom:10px">⚠️ Panel Admin butuh koneksi internet. Sambungkan ke internet lalu muat ulang halaman ini. Kamu tetap bisa buka Asisten PPL secara offline lewat perangkat yang sudah pernah login.</div>
+
+    <button onclick="logoutAkun()" style="width:100%;padding:11px;margin-top:6px;background:none;color:var(--muted);border:none;font-family:inherit;font-size:12.5px;cursor:pointer;text-align:center">🔓 Logout dari perangkat ini</button>
+    <div style="text-align:center;font-size:10px;color:var(--muted);opacity:.7;margin-top:14px">© HUTA CREATIVE STUDIO-2026</div>
+  </div>
+</div>
+<div id="toast">✓ Berhasil disalin!</div>
+<script>window.PAGE_REQUIRES_ADMIN = true; window.PAGE_REQUIRES_ONLINE = true;</script>
+<script src="./js/auth.min.js" defer="defer"></script>
+</body></html>
