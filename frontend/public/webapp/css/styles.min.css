@@ -10,3 +10,21 @@ body.install-banner-open #btnInstallPWA{bottom:156px;transition:bottom .25s ease
 .lock-box .field-label{display:block;text-align:left;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--label-gold);margin-bottom:6px;margin-top:2px}
 .lock-status-row{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
 .btn-logout-app{background:#fff;color:#b22;border:1.5px solid #b22;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap}
+
+.fab-btn{position:fixed;right:20px;bottom:20px;z-index:90;width:58px;height:58px;border-radius:50%;background:linear-gradient(160deg,var(--bps-blue) 0%,#3d0000 100%);color:#f3e9de;border:1px solid rgba(201,138,75,.35);font-size:30px;line-height:1;font-weight:600;box-shadow:0 6px 16px rgba(0,0,0,.35),0 1px 3px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s ease,box-shadow .15s ease}
+.fab-btn:hover{transform:translateY(-2px) scale(1.05)}
+.fab-btn:active{transform:scale(.95)}
+.back-btn{background:none;border:none;color:var(--text-value);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:0}
+.responden-card{display:flex;align-items:flex-start;gap:8px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+.responden-card .rc-main{flex:1;min-width:0;cursor:pointer}
+.responden-card .rc-nama{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+.responden-card .rc-badges{display:flex;flex-wrap:wrap;gap:5px}
+.status-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.status-badge.ok{background:var(--green-bg);color:var(--green)}
+.status-badge.no{background:var(--btn2-bg);color:var(--muted)}
+.rc-del{background:var(--red-bg);border:none;color:var(--red);width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:15px;flex-shrink:0}
+.photo-capture-row{display:flex;gap:8px;margin-top:8px}
+.photo-capture-btn{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:12px 6px;background:var(--bg);border:1.5px dashed var(--copper);border-radius:10px;color:var(--text-value);font-size:12.5px;font-weight:600;cursor:pointer;text-align:center;overflow:hidden}
+.photo-capture-btn:hover{background:var(--blue-bg)}
+.photo-capture-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.geo-coord-box{font-family:'Roboto Mono','Courier New',monospace;font-size:13px;color:var(--text-value);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;word-break:break-all}

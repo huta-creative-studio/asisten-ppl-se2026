@@ -1,28 +1,122 @@
-<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Scan KK/KTP - Panel Admin SE2026</title><meta name="robots" content="noindex,nofollow"><link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png"><link rel="stylesheet" href="./css/styles.min.css"></head><body><header><div class="header-inner"><div class="logo-badge">MITRA-BPS</div><div class="header-title"><h1>Scan KK / KTP</h1><p>Halaman khusus admin — hasil OCR wajib dicek manual</p><p style="font-size:10px;opacity:0.55;margin-top:2px;letter-spacing:0.3px">© HUTA CREATIVE STUDIO-2026</p></div><div class="header-actions"><button onclick="location.href='./rootadmin.html'" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">🔙 Menu Admin</button><button onclick="logoutAkun()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap">🔓 Logout</button></div></div></header><div id="needOnlineMsg" style="display:none;margin:16px;font-size:13px;line-height:1.6;color:var(--text);background:var(--red-bg);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px">⚠️ Halaman ini butuh koneksi internet (OCR diproses di server). Sambungkan ke internet lalu muat ulang halaman.</div><main data-need-online><div data-need-online class="card"><div class="card-title">👤 Responden (database khusus halaman ini)</div><p class="hint">Halaman ini punya daftar responden sendiri, terpisah dari data di Asisten PPL. Data otomatis tersinkron lewat Google Drive (per-folder per responden) — bisa diakses dari perangkat admin lain yang login dengan kode yang sama.</p>
-<div style="display:flex;gap:8px;margin-bottom:12px"><input type="text" id="inputNamaRespondenBaru" placeholder="Nama responden baru" style="flex:1;padding:10px 12px;border:1px solid var(--copper);border-radius:8px;font-size:14px;background:var(--bg);color:var(--text)" onkeydown="if(event.key==='Enter')tambahRespondenOcr()"><button onclick="tambahRespondenOcr()" style="background:linear-gradient(160deg,var(--bps-blue) 0%,#3d0000 100%);color:#f3e9de;border:1px solid rgba(201,138,75,.35);border-radius:8px;padding:0 16px;cursor:pointer;font-weight:600;white-space:nowrap">+ Tambah</button></div>
-<label class="field-label">PILIH RESPONDEN AKTIF</label>
-<select id="pilihResponden" onchange="pilihResponden(this.value)" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--copper);background:var(--card);color:var(--text);margin-bottom:8px"><option value="">Memuat...</option></select>
-<button onclick="hapusRespondenOcr()" style="background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:0">🗑️ Hapus responden yang sedang dipilih</button>
-</div><div id="tab-dokumen"><div class="card"><div class="card-title">📇 Dokumen KK &amp; KTP</div><p class="hint">Foto tersimpan ke Google Drive. Hasil OCR bersifat bantu-baca — <b>wajib dicek &amp; dikoreksi manual</b> oleh petugas, jangan langsung dipercaya 100%.</p>
+<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Scan KK/KTP - Panel Admin SE2026</title><meta name="robots" content="noindex,nofollow"><link rel="manifest" href="./manifest.json"><link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"><link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png"><link rel="stylesheet" href="./css/styles.min.css"></head><body><header><div class="header-inner"><div class="logo-badge">MITRA-BPS</div><div class="header-title"><h1>Scan KK / KTP</h1><p>Halaman khusus admin — hasil OCR wajib dicek manual</p><p style="font-size:10px;opacity:0.55;margin-top:2px;letter-spacing:0.3px">© HUTA CREATIVE STUDIO-2026</p></div><div class="header-actions"><button onclick="location.href='./rootadmin.html'" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap" data-testid="btn-menu-admin">🔙 Menu Admin</button><button onclick="logoutAkun()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap" data-testid="btn-logout">🔓 Logout</button></div></div></header><div id="needOnlineMsg" style="display:none;margin:16px;font-size:13px;line-height:1.6;color:var(--text);background:var(--red-bg);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px">⚠️ Halaman ini butuh koneksi internet (OCR diproses di server). Sambungkan ke internet lalu muat ulang halaman.</div><main data-need-online>
 
-<div class="field"><label>📄 Foto Kartu Keluarga (KK)</label><div class="input-wrap" style="padding:8px"><input type="file" id="inputFotoKK" accept="image/*" capture="environment" onchange="pilihFotoKK(event)" style="width:100%;color:var(--text)"></div><div id="previewFotoKK" style="margin-top:8px"></div><button class="add-btn" id="btnScanKK" onclick="scanKK()" disabled style="margin-top:8px">🔍 Scan &amp; Ekstrak Data KK</button><div id="statusScanKK" class="hint" style="margin-top:6px"></div></div>
-
-<div id="hasilKK" style="display:none;margin-top:14px">
-<div class="card-title" style="font-size:12px">📋 Data KK (hasil scan — boleh dikoreksi)</div>
-<div class="field"><label>No. KK</label><div class="input-wrap"><input type="text" id="kkNomor"></div></div>
-<div class="field"><label>Nama Kepala Keluarga</label><div class="input-wrap"><input type="text" id="kkKepalaKeluarga"></div></div>
-<div class="field"><label>Alamat</label><div class="input-wrap"><input type="text" id="kkAlamat"></div></div>
-<div class="card-title" style="font-size:12px;margin-top:10px">👨‍👩‍👧‍👦 Anggota Keluarga (dari KK)</div>
-<div id="kkAnggotaList"></div>
-<details style="margin-top:8px"><summary class="hint" style="cursor:pointer">Lihat teks mentah hasil OCR (untuk cek manual)</summary><pre id="kkTeksMentah" style="white-space:pre-wrap;font-size:11px;color:var(--muted);background:var(--bg);padding:10px;border-radius:8px;margin-top:6px;max-height:200px;overflow:auto"></pre></details>
-</div>
+<div id="viewDaftarResponden" data-need-online data-testid="view-daftar-responden">
+  <div class="card">
+    <div class="card-title">📋 Daftar Responden</div>
+    <p class="hint">Database khusus halaman ini, terpisah dari data di Asisten PPL. Data otomatis tersinkron lewat Google Drive (per-folder per responden) — bisa diakses dari perangkat admin lain yang login dengan kode yang sama.</p>
+  </div>
+  <div id="daftarRespondenList" data-testid="daftar-responden-list"></div>
+  <div id="emptyStateResponden" class="empty-state" style="display:none" data-testid="empty-state-responden">
+    <span class="empty-icon">🗂️</span>
+    Belum ada data responden.<br>Tekan tombol <b>+</b> di kanan bawah untuk menambah responden baru.
+  </div>
 </div>
 
-<div class="card"><div class="card-title">🪪 Foto KTP per Anggota</div><p class="hint">Ambil foto KTP tiap anggota untuk dicocokkan otomatis dengan data KK di atas.</p><div id="ktpSlotList"></div><button class="add-btn" onclick="tambahSlotKTP()">+ Tambah Foto KTP Anggota</button></div>
+<button id="btnTambahResponden" class="fab-btn" onclick="bukaFormBaru()" data-need-online data-testid="btn-tambah-responden">+</button>
 
-<div class="card"><div class="card-title">⚡ Nomor Meteran Listrik</div><div class="field"><label>No. Rekening / ID Pelanggan Listrik (PLN)</label><div class="input-wrap"><input type="text" id="noMeteranListrik" placeholder="Contoh: 5312xxxxxxxx" oninput="simpanDataDokumen()"></div><p class="hint">Dipakai untuk kebutuhan verifikasi konsumsi listrik rumah tangga.</p></div></div>
+<div id="viewFormResponden" style="display:none" data-need-online data-testid="view-form-responden">
+  <div class="card">
+    <button class="back-btn" onclick="kembaliKeDaftar()" data-testid="btn-kembali-daftar">← Kembali ke Daftar Responden</button>
+    <div class="field" style="margin-top:14px">
+      <label>NAMA RESPONDEN</label>
+      <div class="input-wrap"><input type="text" id="inputNamaRespondenForm" placeholder="Nama responden" oninput="_ubahNamaRespondenAktif(this.value)" data-testid="input-nama-responden"></div>
+    </div>
+    <p class="hint">Nama wajib diisi — dipakai sebagai nama folder penyimpanan foto di Google Drive.</p>
+    <button id="btnHapusRespondenForm" onclick="_hapusRespondenDariForm()" style="display:none;background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;padding:0;margin-top:10px" data-testid="btn-hapus-responden-form">🗑️ Hapus responden ini secara permanen</button>
+  </div>
 
-<div class="card"><div class="card-title">🎓 Pendataan Pendidikan (KK vs Aktual)</div><p class="hint">Bandingkan pendidikan yang tercatat di KK dengan kondisi sebenarnya di lapangan (KTP tidak mencantumkan data pendidikan).</p><div id="pendidikanTable"><div class="hint">Scan KK dulu supaya daftar anggota otomatis terisi.</div></div></div>
+  <div class="inner-tab-nav" id="tabNavResponden">
+    <button class="inner-tab-btn active" data-tab="kk" onclick="pindahTab('kk')" data-testid="tab-btn-kk">📇 KK</button>
+    <button class="inner-tab-btn" data-tab="ktp" onclick="pindahTab('ktp')" data-testid="tab-btn-ktp">🪪 KTP</button>
+    <button class="inner-tab-btn" data-tab="pendidikan" onclick="pindahTab('pendidikan')" data-testid="tab-btn-pendidikan">🎓 Pendidikan</button>
+    <button class="inner-tab-btn" data-tab="meteran" onclick="pindahTab('meteran')" data-testid="tab-btn-meteran">⚡ Meteran</button>
+    <button class="inner-tab-btn" data-tab="fotorumah" onclick="pindahTab('fotorumah')" data-testid="tab-btn-fotorumah">🏠 Foto Rumah</button>
+    <button class="inner-tab-btn" data-tab="geolokasi" onclick="pindahTab('geolokasi')" data-testid="tab-btn-geolokasi">📍 Geolokasi</button>
+  </div>
 
-<button class="reset-btn" onclick="simpanDataDokumen()" style="background:var(--bps-blue);color:#f3e9de;border-color:transparent">💾 Simpan Data Dokumen ke Responden Aktif</button>
-</div></main><div id="toast">✓ Berhasil disalin!</div><script>window.PAGE_REQUIRES_ADMIN = true; window.PAGE_REQUIRES_ONLINE = true;</script><script src="./js/auth.min.js" defer="defer"></script><script src="./js/ocr-kk-ktp.min.js" defer="defer"></script></body></html>
+  <div class="inner-usaha-content active" id="tab-kk" data-testid="tab-content-kk">
+    <div class="card">
+      <div class="card-title">📇 Scan Kartu Keluarga (KK)</div>
+      <p class="hint">Foto tersimpan ke Google Drive folder nama responden. Hasil OCR bersifat bantu-baca — <b>wajib dicek &amp; dikoreksi manual</b>.</p>
+      <div class="photo-capture-row">
+        <label class="photo-capture-btn">📷 Ambil Foto (Kamera)<input type="file" accept="image/*" capture="environment" onchange="pilihFotoKK(event)" data-testid="input-kamera-kk"></label>
+        <label class="photo-capture-btn">🖼️ Pilih dari Galeri<input type="file" accept="image/*" onchange="pilihFotoKK(event)" data-testid="input-galeri-kk"></label>
+      </div>
+      <div id="previewFotoKK" style="margin-top:8px"></div>
+      <button class="add-btn" id="btnScanKK" onclick="scanKK()" disabled style="margin-top:8px" data-testid="btn-scan-kk">🔍 Scan &amp; Ekstrak Data KK</button>
+      <div id="statusScanKK" class="hint" style="margin-top:6px"></div>
+    </div>
+
+    <div id="hasilKK" class="card" style="display:none">
+      <div class="card-title" style="font-size:12px">📋 Data KK (hasil scan — boleh dikoreksi)</div>
+      <div class="field"><label>No. KK</label><div class="input-wrap"><input type="text" id="kkNomor" data-testid="input-kk-nomor"></div></div>
+      <div class="field"><label>Nama Kepala Keluarga</label><div class="input-wrap"><input type="text" id="kkKepalaKeluarga" data-testid="input-kk-kepala-keluarga"></div></div>
+      <div class="field"><label>Alamat</label><div class="input-wrap"><input type="text" id="kkAlamat" data-testid="input-kk-alamat"></div></div>
+      <div class="card-title" style="font-size:12px;margin-top:10px">👨‍👩‍👧‍👦 Anggota Keluarga (dari KK)</div>
+      <div id="kkAnggotaList" data-testid="kk-anggota-list"></div>
+      <details style="margin-top:8px"><summary class="hint" style="cursor:pointer">Lihat teks mentah hasil OCR (untuk cek manual)</summary><pre id="kkTeksMentah" style="white-space:pre-wrap;font-size:11px;color:var(--muted);background:var(--bg);padding:10px;border-radius:8px;margin-top:6px;max-height:200px;overflow:auto"></pre></details>
+    </div>
+  </div>
+
+  <div class="inner-usaha-content" id="tab-ktp" data-testid="tab-content-ktp">
+    <div class="card">
+      <div class="card-title">🪪 Scan KTP &amp; Cocokkan dengan KK</div>
+      <p class="hint">Ambil foto KTP tiap anggota (kamera atau galeri). Nama, NIK, dan tanggal lahir akan dicocokkan otomatis dengan data KK.</p>
+      <div id="ktpSlotList" data-testid="ktp-slot-list"></div>
+      <button class="add-btn" onclick="tambahSlotKTP()" data-testid="btn-tambah-slot-ktp">+ Tambah Foto KTP Anggota</button>
+    </div>
+  </div>
+
+  <div class="inner-usaha-content" id="tab-pendidikan" data-testid="tab-content-pendidikan">
+    <div class="card">
+      <div class="card-title">🎓 Pencocokan Pendidikan (KK vs Aktual)</div>
+      <p class="hint">Bandingkan pendidikan yang tercatat di KK dengan kondisi sebenarnya di lapangan.</p>
+      <div id="pendidikanTable" data-testid="pendidikan-table"><div class="hint">Scan KK dulu supaya daftar anggota otomatis terisi.</div></div>
+    </div>
+  </div>
+
+  <div class="inner-usaha-content" id="tab-meteran" data-testid="tab-content-meteran">
+    <div class="card">
+      <div class="card-title">⚡ Nomor Meter PLN</div>
+      <div class="field"><label>No. Rekening / ID Pelanggan Listrik (PLN)</label><div class="input-wrap"><input type="text" id="noMeteranListrik" placeholder="Contoh: 5312xxxxxxxx" oninput="_updateMeteran(this.value)" data-testid="input-meteran-pln"></div><p class="hint">Diinput manual oleh petugas.</p></div>
+    </div>
+  </div>
+
+  <div class="inner-usaha-content" id="tab-fotorumah" data-testid="tab-content-fotorumah">
+    <div class="card">
+      <div class="card-title">🏠 Foto Depan Rumah</div>
+      <div class="photo-capture-row">
+        <label class="photo-capture-btn">📷 Ambil Foto (Kamera)<input type="file" accept="image/*" capture="environment" onchange="pilihFotoRumah('depan',event)" data-testid="input-kamera-rumah-depan"></label>
+        <label class="photo-capture-btn">🖼️ Pilih dari Galeri<input type="file" accept="image/*" onchange="pilihFotoRumah('depan',event)" data-testid="input-galeri-rumah-depan"></label>
+      </div>
+      <div id="previewRumahDepan" style="margin-top:8px"></div>
+      <div id="statusRumahDepan" class="hint" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🛋️ Foto Ruang Tamu</div>
+      <div class="photo-capture-row">
+        <label class="photo-capture-btn">📷 Ambil Foto (Kamera)<input type="file" accept="image/*" capture="environment" onchange="pilihFotoRumah('ruangTamu',event)" data-testid="input-kamera-rumah-ruangtamu"></label>
+        <label class="photo-capture-btn">🖼️ Pilih dari Galeri<input type="file" accept="image/*" onchange="pilihFotoRumah('ruangTamu',event)" data-testid="input-galeri-rumah-ruangtamu"></label>
+      </div>
+      <div id="previewRumahRuangTamu" style="margin-top:8px"></div>
+      <div id="statusRumahRuangTamu" class="hint" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <div class="inner-usaha-content" id="tab-geolokasi" data-testid="tab-content-geolokasi">
+    <div class="card">
+      <div class="card-title">📍 Geolokasi Rumah Responden</div>
+      <p class="hint">Deteksi otomatis koordinat GPS lokasi HP saat ini.</p>
+      <button class="add-btn" onclick="deteksiGeolokasi()" data-testid="btn-deteksi-geolokasi">📡 Deteksi Lokasi Sekarang</button>
+      <div id="geoResult" style="display:none;margin-top:10px">
+        <div class="geo-coord-box" id="geoCoordText" data-testid="geo-coord-text"></div>
+        <button class="copy-btn" onclick="salinKoordinat()" style="margin-top:8px" data-testid="btn-salin-koordinat">📋 Salin Koordinat</button>
+      </div>
+      <div id="statusGeolokasi" class="hint" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <button class="hitung-btn" onclick="simpanDataResponden()" style="margin-top:6px" data-testid="btn-simpan-responden">💾 Simpan Data Responden</button>
+</div>
+
+</main><div id="toast">✓ Berhasil disalin!</div><script>window.PAGE_REQUIRES_ADMIN = true; window.PAGE_REQUIRES_ONLINE = true;</script><script src="./js/auth.min.js" defer="defer"></script><script src="./js/ocr-kk-ktp.min.js" defer="defer"></script></body></html>
