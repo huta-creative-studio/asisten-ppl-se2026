@@ -71,9 +71,33 @@ New version:
 Patch lengkap sudah diberikan ke user di chat — BELUM ditempel/redeploy
 oleh user per akhir sesi ini.
 
+## Yang sudah diimplementasikan (2026-07-17, sesi 2)
+- `ocrkkktp.html` + `js/ocr-kk-ktp.min.js`: tambah search bar di atas
+  daftar responden (`#searchResponden`), filter live berdasarkan nama,
+  empty-state khusus "tidak ada hasil pencarian" (beda dari empty-state
+  "belum ada data sama sekali"). Tidak ada perubahan backend.
+- `assistencalc.html`/`js/app.min.js`: FIX bug `respondenAktif` basi
+  (stale) di `pushOrReplaceRiwayat()` — sebelumnya kalau user ganti nama
+  responden di form tanpa klik "+ Responden Baru", data baru bisa
+  tertulis ke profil LAMA (karena variabel global `respondenAktif` tidak
+  disinkronkan ulang ke nama yang sedang disimpan). Sekarang key
+  `respondenAktif` selalu dicocokkan ulang ke `namaToKey(a.nama)` data
+  yang sedang disimpan sebelum ditulis ke `respondenDB`. Diverifikasi via
+  simulasi langsung (profil A tetap utuh, profil B baru terbentuk benar,
+  `respondenAktif` berpindah ke B) — lihat screenshot sesi ini.
+- DITUNDA (user minta skip untuk saat ini): fix "hapus responden tidak
+  hapus data online" di `assistencalc.html` — root cause & rencana fix
+  sudah dianalisis (lihat riwayat chat), tapi belum dikerjakan karena user
+  memilih fokus ke search bar + bug respondenAktif dulu.
+
 ## Backlog / Next steps
-- P0: User tempel & redeploy patch Code.gs di atas (wajib agar Tab5 foto
-  rumah & perbandingan tanggal lahir Tab2 berfungsi).
+- P0 (ditunda oleh user): Hapus responden di `assistencalc.html` hanya
+  hapus lokal, belum hapus data online (Google Apps Script action
+  `"upload"` — perlu konfirmasi apakah replace/merge di Code.gs sebelum
+  fix, atau tambah action baru `"hapusresponden"`).
+- P0: User tempel & redeploy patch Code.gs (sesi sebelumnya) — wajib agar
+  Tab5 foto rumah & perbandingan tanggal lahir Tab2 di `ocrkkktp.html`
+  berfungsi.
 - P1: Uji end-to-end pakai kode aktivasi admin asli & foto KK/KTP nyata.
 - P2: Opsional — tambah preview thumbnail foto KK/KTP tersimpan di kartu
   daftar responden (saat ini hanya badge status, belum thumbnail).

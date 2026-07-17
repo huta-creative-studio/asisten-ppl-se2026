@@ -4,8 +4,15 @@
   <div class="card">
     <div class="card-title">📋 Daftar Responden</div>
     <p class="hint">Database khusus halaman ini, terpisah dari data di Asisten PPL. Data otomatis tersinkron lewat Google Drive (per-folder per responden) — bisa diakses dari perangkat admin lain yang login dengan kode yang sama.</p>
+    <div id="searchBarResponden" style="margin-top:10px">
+      <input type="text" id="searchResponden" placeholder="🔍 Cari nama responden..." oninput="_renderDaftarRespondenList()" data-testid="input-search-responden" style="width:100%;padding:10px 14px;border:1px solid var(--copper);border-radius:8px;font-size:14px;box-sizing:border-box">
+    </div>
   </div>
   <div id="daftarRespondenList" data-testid="daftar-responden-list"></div>
+  <div id="emptyStateSearchResponden" class="empty-state" style="display:none" data-testid="empty-state-search-responden">
+    <span class="empty-icon">🔍</span>
+    Tidak ada responden yang cocok dengan pencarian.
+  </div>
   <div id="emptyStateResponden" class="empty-state" style="display:none" data-testid="empty-state-responden">
     <span class="empty-icon">🗂️</span>
     Belum ada data responden.<br>Tekan tombol <b>+</b> di kanan bawah untuk menambah responden baru.
